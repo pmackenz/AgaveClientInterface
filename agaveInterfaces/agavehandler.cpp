@@ -501,6 +501,7 @@ RemoteDataReply * AgaveHandler::stopJob(QString IDstr)
 
 void AgaveHandler::registerAgaveAppInfo(QString agaveAppName, QString fullAgaveName, QStringList parameterList, QStringList inputList, QString workingDirParameter)
 {
+    qCDebug(remoteInterface, "Registering Agave ID: %s", qPrintable(fullAgaveName));
     AgaveTaskGuide * toInsert = new AgaveTaskGuide(agaveAppName, AgaveRequestType::AGAVE_APP);
     toInsert->setAgaveFullName(fullAgaveName);
     toInsert->setAgaveParamList(parameterList);
@@ -930,6 +931,11 @@ void AgaveHandler::handleInternalTask(AgaveTaskReply * agaveReply, QNetworkReply
         qCDebug(remoteInterface, "Non-existant internal request requested.");
         forwardReplyToParent(agaveReply, RequestState::UNKNOWN_TASK);
     }
+}
+
+void AgaveHandler::saveAppList(QVariantList newAppList)
+{
+    savedAppList = newAppList;
 }
 
 AgaveTaskReply * AgaveHandler::performAgaveQuery(QString queryName)

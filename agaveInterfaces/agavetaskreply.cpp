@@ -456,6 +456,7 @@ void AgaveTaskReply::rawTaskComplete()
         //TODO More error checking here
         QJsonValue expectedArray = retriveMainAgaveJSON(&parseHandler,"result");
         QJsonArray appList = expectedArray.toArray();
+        myManager->saveAppList(appList.toVariantList());
         emit haveAgaveAppList(RequestState::GOOD, appList.toVariantList());
     }
     else
