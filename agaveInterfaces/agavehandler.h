@@ -121,7 +121,6 @@ signals:
 
 protected:
     void handleInternalTask(AgaveTaskReply *agaveReply, QNetworkReply * rawReply);
-    void saveAppList(QVariantList newAppList);
 
 private slots:
     void finishedOneTask();
@@ -164,7 +163,6 @@ private:
     QString clientSecret;
 
     QMap<QString, AgaveTaskGuide*> validTaskList;
-    QVariantList savedAppList;
 
     QString pwd = "";
 

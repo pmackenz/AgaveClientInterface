@@ -933,11 +933,6 @@ void AgaveHandler::handleInternalTask(AgaveTaskReply * agaveReply, QNetworkReply
     }
 }
 
-void AgaveHandler::saveAppList(QVariantList newAppList)
-{
-    savedAppList = newAppList;
-}
-
 AgaveTaskReply * AgaveHandler::performAgaveQuery(QString queryName)
 {
     QMap<QString, QByteArray> taskVars;
