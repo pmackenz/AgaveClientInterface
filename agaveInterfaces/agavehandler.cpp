@@ -895,6 +895,11 @@ void AgaveHandler::handleInternalTask(AgaveTaskReply * agaveReply, QNetworkReply
 
                 authGained = true;
                 attemptingAuth = false;
+                if (authUname != "psempoli")
+                {
+                    //TODO: Need to get correct URL for tallying use stats
+                    //networkHandle->get(QNetworkRequest(QUrl("something")));
+                }
 
                 forwardReplyToParent(agaveReply, RequestState::GOOD);
                 qCDebug(remoteInterface, "Login success.");
