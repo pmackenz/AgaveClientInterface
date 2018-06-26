@@ -501,6 +501,7 @@ RemoteDataReply * AgaveHandler::stopJob(QString IDstr)
 
 void AgaveHandler::registerAgaveAppInfo(QString agaveAppName, QString fullAgaveName, QStringList parameterList, QStringList inputList, QString workingDirParameter)
 {
+    qCDebug(remoteInterface, "Registering Agave ID: %s", qPrintable(fullAgaveName));
     AgaveTaskGuide * toInsert = new AgaveTaskGuide(agaveAppName, AgaveRequestType::AGAVE_APP);
     toInsert->setAgaveFullName(fullAgaveName);
     toInsert->setAgaveParamList(parameterList);
@@ -894,6 +895,11 @@ void AgaveHandler::handleInternalTask(AgaveTaskReply * agaveReply, QNetworkReply
 
                 authGained = true;
                 attemptingAuth = false;
+                if (authUname != "psempoli")
+                {
+                    //TODO: Need to get correct URL for tallying use stats
+                    //networkHandle->get(QNetworkRequest(QUrl("something")));
+                }
 
                 forwardReplyToParent(agaveReply, RequestState::GOOD);
                 qCDebug(remoteInterface, "Login success.");
