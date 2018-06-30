@@ -51,6 +51,15 @@ void AgaveThread::registerAgaveAppInfo(QString agaveAppName, QString fullAgaveNa
                               Q_ARG(QString, workingDirParameter));
 }
 
+void AgaveThread::sendCounterPing(QString urlForPing)
+{
+    QMutexLocker lock(&readyLock);
+
+    if (!remoteThreadReady()) return;
+    QMetaObject::invokeMethod(myInterface, "sendCounterPing", Qt::BlockingQueuedConnection,
+                              Q_ARG(QString, urlForPing));
+}
+
 AgaveTaskReply * AgaveThread::getAgaveAppList()
 {
     QMutexLocker lock(&readyLock);

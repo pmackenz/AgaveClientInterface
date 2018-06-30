@@ -46,7 +46,7 @@
 AgaveHandler::AgaveHandler() :
         RemoteDataInterface(), networkHandle(0), SSLoptions()
 {
-    SSLoptions.setProtocol(QSsl::SecureProtocols);
+    //SSLoptions.setProtocol(QSsl::SecureProtocols);
     clearAllAuthTokens();
 
     setupTaskGuideList();
@@ -541,6 +541,11 @@ RemoteDataReply * AgaveHandler::closeAllConnections()
     return waitHandle;
 }
 
+void AgaveHandler::sendCounterPing(QString urlForPing)
+{
+    networkHandle.get(QNetworkRequest(QUrl(urlForPing)));
+}
+
 void AgaveHandler::clearAllAuthTokens()
 {
     attemptingAuth = false;
@@ -895,11 +900,6 @@ void AgaveHandler::handleInternalTask(AgaveTaskReply * agaveReply, QNetworkReply
 
                 authGained = true;
                 attemptingAuth = false;
-                if (authUname != "psempoli")
-                {
-                    //TODO: Need to get correct URL for tallying use stats
-                    //networkHandle->get(QNetworkRequest(QUrl("something")));
-                }
 
                 forwardReplyToParent(agaveReply, RequestState::GOOD);
                 qCDebug(remoteInterface, "Login success.");

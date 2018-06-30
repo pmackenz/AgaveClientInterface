@@ -69,6 +69,7 @@ public:
     virtual bool isDisconnected();
 
     virtual RemoteDataReply * closeAllConnections();
+    void sendCounterPing(QString urlForPing);
 
     //Defaults to directory root,
     //Subsequent commands with remote folder names are either absolute paths
