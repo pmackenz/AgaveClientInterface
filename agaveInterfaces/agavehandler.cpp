@@ -46,7 +46,7 @@
 AgaveHandler::AgaveHandler() :
         RemoteDataInterface(), networkHandle(0), SSLoptions()
 {
-    //SSLoptions.setProtocol(QSsl::SecureProtocols);
+    SSLoptions.setProtocol(QSsl::SecureProtocols);
     clearAllAuthTokens();
 
     setupTaskGuideList();
