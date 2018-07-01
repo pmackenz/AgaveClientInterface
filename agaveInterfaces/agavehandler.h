@@ -69,7 +69,6 @@ public:
     virtual bool isDisconnected();
 
     virtual RemoteDataReply * closeAllConnections();
-    void sendCounterPing(QString urlForPing);
 
     //Defaults to directory root,
     //Subsequent commands with remote folder names are either absolute paths
@@ -95,7 +94,6 @@ public:
     virtual RemoteDataReply * downloadBuffer(QString remoteName);
 
     virtual RemoteDataReply * runRemoteJob(QString jobName, ParamMap jobParameters, QString remoteWorkingDir, QString indivJobName = "");
-    RemoteDataReply * runAgaveJob(QJsonDocument rawJobJSON);
 
     virtual RemoteDataReply * getListOfJobs();
     virtual RemoteDataReply * getJobDetails(QString IDstr);
@@ -117,6 +115,10 @@ public slots:
 
     //For debugging purposes, to retrive the list of available Agave Apps:
     AgaveTaskReply * getAgaveAppList();
+
+    void sendCounterPing(QString urlForPing);
+    RemoteDataReply * runAgaveJob(QJsonDocument rawJobJSON);
+
 signals:
     void finishedAllTasks();
 

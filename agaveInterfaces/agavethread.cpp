@@ -71,13 +71,13 @@ AgaveTaskReply * AgaveThread::getAgaveAppList()
     return retVal;
 }
 
-AgaveTaskReply * AgaveThread::runRemoteJob(QJsonDocument rawJobJSON)
+AgaveTaskReply * AgaveThread::runAgaveJob(QJsonDocument rawJobJSON)
 {
     QMutexLocker lock(&readyLock);
 
     if (!remoteThreadReady()) return NULL;
     AgaveTaskReply * retVal = NULL;
-    QMetaObject::invokeMethod(myInterface, "runRemoteJob", Qt::BlockingQueuedConnection,
+    QMetaObject::invokeMethod(myInterface, "runAgaveJob", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(AgaveTaskReply *, retVal),
                               Q_ARG(QJsonDocument, rawJobJSON));
     return retVal;
