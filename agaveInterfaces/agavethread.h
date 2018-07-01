@@ -51,7 +51,7 @@ public:
 
     AgaveTaskReply * getAgaveAppList();
 
-    AgaveTaskReply * runRemoteJob(QJsonDocument rawJobJSON);
+    AgaveTaskReply * runAgaveJob(QJsonDocument rawJobJSON);
 
 protected:
     virtual void run();
