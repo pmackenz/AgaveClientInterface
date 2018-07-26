@@ -64,8 +64,8 @@ AgaveTaskReply * AgaveThread::getAgaveAppList()
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    AgaveTaskReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    AgaveTaskReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "getAgaveAppList", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(AgaveTaskReply *, retVal));
     return retVal;
@@ -75,8 +75,8 @@ AgaveTaskReply * AgaveThread::runAgaveJob(QJsonDocument rawJobJSON)
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    AgaveTaskReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    AgaveTaskReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "runAgaveJob", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(AgaveTaskReply *, retVal),
                               Q_ARG(QJsonDocument, rawJobJSON));
@@ -90,5 +90,5 @@ void AgaveThread::run()
 
     RemoteDataThread::run();
 
-    myInterface = NULL;
+    myInterface = nullptr;
 }

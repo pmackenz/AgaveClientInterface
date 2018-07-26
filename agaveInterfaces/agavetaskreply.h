@@ -50,7 +50,7 @@ class AgaveTaskReply : public RemoteDataReply
     Q_OBJECT
 
 public:
-    explicit AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply *newReply, AgaveHandler * theManager, QObject *parent = 0);
+    explicit AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply *newReply, AgaveHandler * theManager, QObject *parent = nullptr);
     ~AgaveTaskReply();
 
     QMap<QString, QByteArray> *getTaskParamList();
@@ -91,10 +91,10 @@ private:
 
     void processDatalessReply(RequestState replyState);
 
-    AgaveHandler * myManager = NULL;
-    AgaveTaskReply * passThruRef = NULL;
-    AgaveTaskGuide * myGuide = NULL;
-    QNetworkReply * myReplyObject = NULL;
+    AgaveHandler * myManager = nullptr;
+    AgaveTaskReply * passThruRef = nullptr;
+    AgaveTaskGuide * myGuide = nullptr;
+    QNetworkReply * myReplyObject = nullptr;
 
     //PassThru reply store:
     RequestState pendingReply;

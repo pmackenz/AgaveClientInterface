@@ -69,11 +69,11 @@ public:
 
     QString getTaskID();
     QByteArray getURLsuffix();
-    QByteArray getArgAndURLsuffix(QMap<QString, QByteArray> * varList = NULL);
+    QByteArray getArgAndURLsuffix(QMap<QString, QByteArray> * varList = nullptr);
     AgaveRequestType getRequestType();
     AuthHeaderType getHeaderType();
-    QByteArray fillPostArgList(QMap<QString, QByteArray> * argList = NULL);
-    QByteArray fillURLArgList(QMap<QString, QByteArray> * argList = NULL);
+    QByteArray fillPostArgList(QMap<QString, QByteArray> * argList = nullptr);
+    QByteArray fillURLArgList(QMap<QString, QByteArray> * argList = nullptr);
     bool isTokenFormat();
     bool isInternal();
 

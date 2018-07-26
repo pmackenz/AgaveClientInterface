@@ -130,10 +130,10 @@ private slots:
 
 private:
     AgaveTaskReply * performAgaveQuery(QString queryName);
-    AgaveTaskReply * performAgaveQuery(QString queryName, QMap<QString, QByteArray> varList, QObject *parentReq = NULL);
+    AgaveTaskReply * performAgaveQuery(QString queryName, QMap<QString, QByteArray> varList, QObject *parentReq = nullptr);
 
     QNetworkReply * distillRequestData(AgaveTaskGuide * theGuide, QMap<QString, QByteArray> * varList);
-    QNetworkReply * finalizeAgaveRequest(AgaveTaskGuide * theGuide, QString urlAppend, QByteArray * authHeader = NULL, QByteArray postData = "", QIODevice * fileHandle = NULL);
+    QNetworkReply * finalizeAgaveRequest(AgaveTaskGuide * theGuide, QString urlAppend, QByteArray * authHeader = nullptr, QByteArray postData = "", QIODevice * fileHandle = nullptr);
 
     void forwardReplyToParent(AgaveTaskReply * agaveReply, RequestState replyState);
     void forwardReplyToParent(AgaveTaskReply * agaveReply, RequestState replyState, QString param1);

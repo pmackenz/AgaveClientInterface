@@ -68,7 +68,7 @@ enum class RequestState {GOOD, PENDING,
                          MISSING_REPLY_DATA, STOPPED_BY_USER,
                          INVALID_PARAM, NOT_READY,
                          NOT_IMPLEMENTED, UNCLASSIFIED};
-//If RemoteDataReply returned is NULL, then the request was invalid due to internal error
+//If RemoteDataReply returned is nullptr, then the request was invalid due to internal error
 
 class RemoteDataReply : public QObject
 {
@@ -109,7 +109,7 @@ class RemoteDataInterface : public QObject
     Q_OBJECT
 
 public:
-    RemoteDataInterface(QObject * parent = NULL);
+    RemoteDataInterface(QObject * parent = nullptr);
 
 public slots:
     virtual QString getUserName() = 0;
@@ -199,7 +199,7 @@ public:
 protected:
     //In subclass, run() method should point this to a
     //stack variable within run
-    RemoteDataInterface * myInterface = NULL;
+    RemoteDataInterface * myInterface = nullptr;
     QMutex readyLock;
 
     virtual void run();

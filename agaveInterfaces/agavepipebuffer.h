@@ -41,7 +41,7 @@
 class AgavePipeBuffer : public QBuffer
 {
 public:
-    AgavePipeBuffer(QByteArray * oldBuffer, QObject * parent = NULL);
+    AgavePipeBuffer(QByteArray * oldBuffer, QObject * parent = nullptr);
 private:
     QByteArray myByteArray;
 };
