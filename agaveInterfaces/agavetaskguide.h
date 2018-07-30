@@ -36,10 +36,7 @@
 #ifndef AGAVETASKGUIDE_H
 #define AGAVETASKGUIDE_H
 
-//#include <QMap>
-#include <QString>
 #include <QStringList>
-//#include <QList>
 
 enum class AgaveRequestType;
 
@@ -99,8 +96,8 @@ private:
 
     QString postFormat = "";
     QString dynURLFormat = "";
-    QList<QString> postVarNames;
-    QList<QString> urlVarNames;
+    QStringList postVarNames;
+    QStringList urlVarNames;
 
     QString agaveFullName;
     QString agavePWDparam;

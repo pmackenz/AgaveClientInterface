@@ -39,11 +39,8 @@
 #include "filemetadata.h"
 #include "remotejobdata.h"
 
-#include <QObject>
 #include <QThread>
 #include <QMutex>
-#include <QMutexLocker>
-#include <QMap>
 #include <QJsonDocument>
 #include <QLoggingCategory>
 

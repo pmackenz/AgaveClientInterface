@@ -38,9 +38,11 @@
 
 #include "../remotedatainterface.h"
 
-#include <QNetworkAccessManager>
+#include <QNetworkReply>
+
 #include <QTimer>
 #include <QMetaMethod>
+#include <QJsonArray>
 
 class AgaveHandler;
 class AgaveTaskGuide;
