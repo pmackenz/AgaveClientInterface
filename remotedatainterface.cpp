@@ -92,11 +92,8 @@ QString RemoteDataInterface::interpretRequestState(RequestState theState)
         return "An unclassified error occured";
     case RequestState::STOPPED_BY_USER:
         return "Task stopped by user";
-
-    default:
-        return "INTERNAL ERROR";
     }
-    return "INTERNAL ERROR (2)";
+    return "INTERNAL ERROR";
 }
 
 RemoteDataReply::RemoteDataReply(QObject * parent):QObject(parent) {}
@@ -114,7 +111,7 @@ bool RemoteDataThread::interfaceReady()
 
 void RemoteDataThread::run()
 {
-    if (myInterface == NULL)
+    if (myInterface == nullptr)
     {
         qCDebug(remoteInterface, "Internal ERROR: Remote Data Thread not subclassed properly.");
         return;
@@ -163,8 +160,8 @@ RemoteDataReply * RemoteDataThread::setCurrentRemoteWorkingDirectory(QString cd)
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "setCurrentRemoteWorkingDirectory", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal),
                               Q_ARG(QString, cd));
@@ -175,8 +172,8 @@ RemoteDataReply * RemoteDataThread::closeAllConnections()
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "closeAllConnections", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal));
     return retVal;
@@ -186,8 +183,8 @@ RemoteDataReply * RemoteDataThread::performAuth(QString uname, QString passwd)
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "performAuth", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal),
                               Q_ARG(QString, uname),
@@ -199,8 +196,8 @@ RemoteDataReply * RemoteDataThread::remoteLS(QString dirPath)
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "remoteLS", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal),
                               Q_ARG(QString, dirPath));
@@ -211,8 +208,8 @@ RemoteDataReply * RemoteDataThread::deleteFile(QString toDelete)
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "deleteFile", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal),
                               Q_ARG(QString, toDelete));
@@ -223,8 +220,8 @@ RemoteDataReply * RemoteDataThread::moveFile(QString from, QString to)
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "moveFile", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal),
                               Q_ARG(QString, from),
@@ -236,8 +233,8 @@ RemoteDataReply * RemoteDataThread::copyFile(QString from, QString to)
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "copyFile", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal),
                               Q_ARG(QString, from),
@@ -249,8 +246,8 @@ RemoteDataReply * RemoteDataThread::renameFile(QString fullName, QString newName
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "renameFile", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal),
                               Q_ARG(QString, fullName),
@@ -262,8 +259,8 @@ RemoteDataReply * RemoteDataThread::mkRemoteDir(QString location, QString newNam
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "mkRemoteDir", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal),
                               Q_ARG(QString, location),
@@ -275,8 +272,8 @@ RemoteDataReply * RemoteDataThread::uploadFile(QString location, QString localFi
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "uploadFile", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal),
                               Q_ARG(QString, location),
@@ -288,8 +285,8 @@ RemoteDataReply * RemoteDataThread::uploadBuffer(QString location, QByteArray fi
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "uploadBuffer", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal),
                               Q_ARG(QString, location),
@@ -302,8 +299,8 @@ RemoteDataReply * RemoteDataThread::downloadFile(QString localDest, QString remo
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "downloadFile", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal),
                               Q_ARG(QString, localDest),
@@ -315,8 +312,8 @@ RemoteDataReply * RemoteDataThread::downloadBuffer(QString remoteName)
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "downloadBuffer", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal),
                               Q_ARG(QString, remoteName));
@@ -327,8 +324,8 @@ RemoteDataReply * RemoteDataThread::runRemoteJob(QString jobName, QMap<QString, 
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "runRemoteJob", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal),
                               Q_ARG(QString, jobName),
@@ -342,8 +339,8 @@ RemoteDataReply * RemoteDataThread::getListOfJobs()
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "getListOfJobs", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal));
     return retVal;
@@ -353,8 +350,8 @@ RemoteDataReply * RemoteDataThread::getJobDetails(QString IDstr)
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "getJobDetails", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal),
                               Q_ARG(QString, IDstr));
@@ -365,8 +362,8 @@ RemoteDataReply * RemoteDataThread::stopJob(QString IDstr)
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    RemoteDataReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    RemoteDataReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "stopJob", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(RemoteDataReply *, retVal),
                               Q_ARG(QString, IDstr));

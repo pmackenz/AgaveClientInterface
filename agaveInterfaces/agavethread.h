@@ -47,10 +47,11 @@ public:
     AgaveThread(QObject * parent);
 
     void registerAgaveAppInfo(QString agaveAppName, QString fullAgaveName, QStringList parameterList, QStringList inputList, QString workingDirParameter);
+    void sendCounterPing(QString urlForPing);
 
     AgaveTaskReply * getAgaveAppList();
 
-    AgaveTaskReply * runRemoteJob(QJsonDocument rawJobJSON);
+    AgaveTaskReply * runAgaveJob(QJsonDocument rawJobJSON);
 
 protected:
     virtual void run();

@@ -37,7 +37,6 @@
 #define FILEMETADATA_H
 
 #include <QStringList>
-#include <QString>
 
 enum class FileType {FILE, DIR, SIM_LINK, INVALID, NIL}; //Add more as needed
 

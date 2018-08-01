@@ -36,10 +36,7 @@
 #ifndef AGAVETASKGUIDE_H
 #define AGAVETASKGUIDE_H
 
-//#include <QMap>
-#include <QString>
 #include <QStringList>
-//#include <QList>
 
 enum class AgaveRequestType;
 
@@ -69,11 +66,11 @@ public:
 
     QString getTaskID();
     QByteArray getURLsuffix();
-    QByteArray getArgAndURLsuffix(QMap<QString, QByteArray> * varList = NULL);
+    QByteArray getArgAndURLsuffix(QMap<QString, QByteArray> * varList = nullptr);
     AgaveRequestType getRequestType();
     AuthHeaderType getHeaderType();
-    QByteArray fillPostArgList(QMap<QString, QByteArray> * argList = NULL);
-    QByteArray fillURLArgList(QMap<QString, QByteArray> * argList = NULL);
+    QByteArray fillPostArgList(QMap<QString, QByteArray> * argList = nullptr);
+    QByteArray fillURLArgList(QMap<QString, QByteArray> * argList = nullptr);
     bool isTokenFormat();
     bool isInternal();
 
@@ -99,8 +96,8 @@ private:
 
     QString postFormat = "";
     QString dynURLFormat = "";
-    QList<QString> postVarNames;
-    QList<QString> urlVarNames;
+    QStringList postVarNames;
+    QStringList urlVarNames;
 
     QString agaveFullName;
     QString agavePWDparam;

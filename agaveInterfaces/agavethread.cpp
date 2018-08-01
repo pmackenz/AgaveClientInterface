@@ -51,24 +51,33 @@ void AgaveThread::registerAgaveAppInfo(QString agaveAppName, QString fullAgaveNa
                               Q_ARG(QString, workingDirParameter));
 }
 
+void AgaveThread::sendCounterPing(QString urlForPing)
+{
+    QMutexLocker lock(&readyLock);
+
+    if (!remoteThreadReady()) return;
+    QMetaObject::invokeMethod(myInterface, "sendCounterPing", Qt::BlockingQueuedConnection,
+                              Q_ARG(QString, urlForPing));
+}
+
 AgaveTaskReply * AgaveThread::getAgaveAppList()
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    AgaveTaskReply * retVal = NULL;
+    if (!remoteThreadReady()) return nullptr;
+    AgaveTaskReply * retVal = nullptr;
     QMetaObject::invokeMethod(myInterface, "getAgaveAppList", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(AgaveTaskReply *, retVal));
     return retVal;
 }
 
-AgaveTaskReply * AgaveThread::runRemoteJob(QJsonDocument rawJobJSON)
+AgaveTaskReply * AgaveThread::runAgaveJob(QJsonDocument rawJobJSON)
 {
     QMutexLocker lock(&readyLock);
 
-    if (!remoteThreadReady()) return NULL;
-    AgaveTaskReply * retVal = NULL;
-    QMetaObject::invokeMethod(myInterface, "runRemoteJob", Qt::BlockingQueuedConnection,
+    if (!remoteThreadReady()) return nullptr;
+    AgaveTaskReply * retVal = nullptr;
+    QMetaObject::invokeMethod(myInterface, "runAgaveJob", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(AgaveTaskReply *, retVal),
                               Q_ARG(QJsonDocument, rawJobJSON));
     return retVal;
@@ -81,5 +90,5 @@ void AgaveThread::run()
 
     RemoteDataThread::run();
 
-    myInterface = NULL;
+    myInterface = nullptr;
 }
