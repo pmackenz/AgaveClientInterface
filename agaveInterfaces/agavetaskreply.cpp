@@ -48,19 +48,19 @@ AgaveTaskReply::AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply * newRep
     myReplyObject = newReply;
     pendingReply = RequestState::INTERNAL_ERROR;
 
-    if (myManager == NULL)
+    if (myManager == nullptr)
     {
         delayedPassThruReply(RequestState::INTERNAL_ERROR);
         return;
     }
 
-    if (myGuide == NULL)
+    if (myGuide == nullptr)
     {
         delayedPassThruReply(RequestState::UNKNOWN_TASK);
         return;
     }
 
-    if ((myReplyObject == NULL) && (myGuide->getRequestType() != AgaveRequestType::AGAVE_NONE))
+    if ((myReplyObject == nullptr) && (myGuide->getRequestType() != AgaveRequestType::AGAVE_NONE))
     {
         delayedPassThruReply(RequestState::INTERNAL_ERROR);
         return;
@@ -71,7 +71,7 @@ AgaveTaskReply::AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply * newRep
         pendingReply = RequestState::GOOD;
     }
 
-    if (myReplyObject != NULL)
+    if (myReplyObject != nullptr)
     {
         QObject::connect(myReplyObject, SIGNAL(finished()), this, SLOT(rawTaskComplete()));
     }
@@ -79,7 +79,7 @@ AgaveTaskReply::AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply * newRep
 
 AgaveTaskReply::~AgaveTaskReply()
 {
-    if (myReplyObject != NULL)
+    if (myReplyObject != nullptr)
     {
         myReplyObject->deleteLater();
     }
@@ -101,7 +101,7 @@ void AgaveTaskReply::delayedPassThruReply(RequestState replyState, QString param
     usingPassThru = true;
 
     pendingReply = replyState;
-    if (param1 == NULL)
+    if (param1 == nullptr)
     {
         pendingParam = "";
     }
@@ -110,7 +110,7 @@ void AgaveTaskReply::delayedPassThruReply(RequestState replyState, QString param
         pendingParam = param1;
     }
 
-    QTimer * quickTimer = new QTimer((QObject*)this);
+    QTimer * quickTimer = new QTimer(qobject_cast<QObject*>(this));
     QObject::connect(quickTimer, SIGNAL(timeout()), this, SLOT(rawTaskComplete()));
     quickTimer->start(1);
 }
@@ -195,7 +195,7 @@ void AgaveTaskReply::processDatalessReply(RequestState replyState)
     }
     else if (myGuide->getTaskID() == "filePipeDownload")
     {
-        emit haveBufferDownloadReply(replyState, NULL);
+        emit haveBufferDownloadReply(replyState, nullptr);
     }
     else if (myGuide->getTaskID() == "getJobList")
     {
@@ -230,7 +230,7 @@ void AgaveTaskReply::rawTaskComplete()
     this->deleteLater();
 
     if ((myGuide->getRequestType() == AgaveRequestType::AGAVE_NONE) ||
-            (usingPassThru == true) || (myReplyObject == NULL))
+            (usingPassThru == true) || (myReplyObject == nullptr))
     {
         invokePassThruReply();
         return;

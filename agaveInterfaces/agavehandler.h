@@ -38,16 +38,12 @@
 
 #include "../remotedatainterface.h"
 
-#include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QHttpMultiPart>
+#include <QFile>
 
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonArray>
-
-#include <QFile>
-#include <QMap>
 
 enum class AgaveRequestType {AGAVE_GET, AGAVE_POST, AGAVE_DELETE, AGAVE_UPLOAD, AGAVE_PIPE_UPLOAD, AGAVE_PIPE_DOWNLOAD, AGAVE_DOWNLOAD, AGAVE_PUT, AGAVE_NONE, AGAVE_APP};
 
@@ -130,10 +126,10 @@ private slots:
 
 private:
     AgaveTaskReply * performAgaveQuery(QString queryName);
-    AgaveTaskReply * performAgaveQuery(QString queryName, QMap<QString, QByteArray> varList, QObject *parentReq = NULL);
+    AgaveTaskReply * performAgaveQuery(QString queryName, QMap<QString, QByteArray> varList, QObject *parentReq = nullptr);
 
     QNetworkReply * distillRequestData(AgaveTaskGuide * theGuide, QMap<QString, QByteArray> * varList);
-    QNetworkReply * finalizeAgaveRequest(AgaveTaskGuide * theGuide, QString urlAppend, QByteArray * authHeader = NULL, QByteArray postData = "", QIODevice * fileHandle = NULL);
+    QNetworkReply * finalizeAgaveRequest(AgaveTaskGuide * theGuide, QString urlAppend, QByteArray * authHeader = nullptr, QByteArray postData = "", QIODevice * fileHandle = nullptr);
 
     void forwardReplyToParent(AgaveTaskReply * agaveReply, RequestState replyState);
     void forwardReplyToParent(AgaveTaskReply * agaveReply, RequestState replyState, QString param1);

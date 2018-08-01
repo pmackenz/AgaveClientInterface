@@ -110,12 +110,12 @@ QByteArray AgaveTaskGuide::fillURLArgList(QMap<QString, QByteArray> *argList)
 QByteArray AgaveTaskGuide::fillAnyArgList(QMap<QString, QByteArray> * argList, QList<QString> * subNames, QString * strFormat)
 {
     QByteArray empty;
-    if (strFormat == NULL)
+    if (strFormat == nullptr)
     {
         return empty;
     }
 
-    if ((argList == NULL) || (subNames == NULL) || (subNames->empty()))
+    if ((argList == nullptr) || (subNames == nullptr) || (subNames->empty()))
     {
         return strFormat->toLatin1();
     }
