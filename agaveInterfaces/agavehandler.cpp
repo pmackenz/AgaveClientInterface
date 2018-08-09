@@ -39,7 +39,7 @@
 #include "agavetaskreply.h"
 #include "agavepipebuffer.h"
 
-#include "../filemetadata.h"
+#include "filemetadata.h"
 
 //TODO: need to do more double checking of valid file paths
 

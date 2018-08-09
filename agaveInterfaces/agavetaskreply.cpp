@@ -38,8 +38,8 @@
 #include "agavehandler.h"
 #include "agavetaskguide.h"
 
-#include "../AgaveClientInterface/filemetadata.h"
-#include "../AgaveClientInterface/remotejobdata.h"
+#include "filemetadata.h"
+#include "remotejobdata.h"
 
 AgaveTaskReply::AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply * newReply, AgaveHandler *theManager, QObject *parent) : RemoteDataReply(parent)
 {
