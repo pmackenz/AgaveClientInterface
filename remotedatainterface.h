@@ -50,11 +50,10 @@ Q_DECLARE_METATYPE(ParamMap)
 Q_DECLARE_LOGGING_CATEGORY(remoteInterface)
 Q_DECLARE_LOGGING_CATEGORY(rawHTTP)
 
-//Good means the request was good and
-//Fail means the remote service replied, but did not like the request, for some reason
-//No Connect means that the request did not get thru to the remote service at all
+enum class RemoteDataInterfaceState {INIT, READY, AUTH_TRY, CONNECTED, DISCONNECTING, DISCONNECTED};
+
 enum class RequestState {GOOD, PENDING,
-                         UNKNOWN_TASK, INTERNAL_ERROR,
+                         UNKNOWN_TASK, INTERNAL_ERROR, INVALID_STATE,
                          SIGNAL_OBJ_MISMATCH, SERVICE_UNAVAILABLE,
                          LOST_INTERNET, DROPPED_CONNECTION,
                          NO_CHANGE_DIR, FILE_NOT_FOUND,
@@ -115,11 +114,11 @@ public slots:
     //Defaults to directory root,
     //Subsequent commands with remote folder names are either absolute paths
     //or reletive to the current working directory
-    virtual RemoteDataReply * setCurrentRemoteWorkingDirectory(QString cd) = 0;
     virtual RemoteDataReply * closeAllConnections() = 0;
 
     //Remote tasks to be implemented in subclasses:
     //Returns a RemoteDataReply, which should have the correct signal attached to an appropriate slot
+    //These methods should ALWAYS return a valid pointer
     virtual RemoteDataReply * performAuth(QString uname, QString passwd) = 0;
 
     virtual RemoteDataReply * remoteLS(QString dirPath) = 0;
@@ -142,7 +141,10 @@ public slots:
     virtual RemoteDataReply * getJobDetails(QString IDstr) = 0;
     virtual RemoteDataReply * stopJob(QString IDstr) = 0;
 
+    virtual RemoteDataInterfaceState getInterfaceState();
+
     static QString interpretRequestState(RequestState theState);
+    static QString removeDoubleSlashes(QString stringIn);
 };
 
 class RemoteDataThread : public QThread
@@ -168,7 +170,6 @@ public:
     QString getUserName();
     bool isDisconnected();
 
-    RemoteDataReply * setCurrentRemoteWorkingDirectory(QString cd);
     RemoteDataReply * closeAllConnections();
 
     RemoteDataReply * performAuth(QString uname, QString passwd);

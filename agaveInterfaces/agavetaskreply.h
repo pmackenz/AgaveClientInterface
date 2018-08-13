@@ -53,15 +53,13 @@ class AgaveTaskReply : public RemoteDataReply
 
 public:
     explicit AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply *newReply, AgaveHandler * theManager, QObject *parent = nullptr);
+    explicit AgaveTaskReply(AgaveTaskGuide * theGuide, RequestState passThruErrorState, AgaveHandler * theManager, QObject *parent = nullptr);
     ~AgaveTaskReply();
 
     QMap<QString, QByteArray> *getTaskParamList();
 
     //-------------------------------------------------
     //Agave specific:
-    void delayedPassThruReply(RequestState replyState);
-    void delayedPassThruReply(RequestState replyState, QString param1);
-
     AgaveTaskGuide * getTaskGuide();
 
     static RequestState standardSuccessFailCheck(AgaveTaskGuide * taskGuide, QJsonDocument * parsedDoc);
@@ -82,26 +80,28 @@ signals:
     //Double-check that the data is all passed.
     void haveAgaveAppList(RequestState theGuide, QVariantList appsList);
 
+public slots:
+    void rawNoDataNoHttpTaskComplete(RequestState replyState);
+
 private slots:
-    void rawTaskComplete();
+    void rawPassThruTaskComplete();
+    void rawHttpTaskComplete();
 
 private:
+    bool performInitPointerCheck(AgaveTaskGuide * theGuide, AgaveHandler * theManager);
+
     void signalConnectDelay();
     bool anySignalConnect();
 
-    void invokePassThruReply();
-
+    void setDelayedDatalessReply(RequestState replyState);
     void processDatalessReply(RequestState replyState);
 
     AgaveHandler * myManager = nullptr;
-    AgaveTaskReply * passThruRef = nullptr;
     AgaveTaskGuide * myGuide = nullptr;
     QNetworkReply * myReplyObject = nullptr;
 
-    //PassThru reply store:
-    RequestState pendingReply;
-    QString pendingParam;
-    bool usingPassThru = false;
+    //No delayedDataless reply store:
+    RequestState pendingReply = RequestState::INTERNAL_ERROR;
 
     QMap<QString, QByteArray> taskParamList;
 };

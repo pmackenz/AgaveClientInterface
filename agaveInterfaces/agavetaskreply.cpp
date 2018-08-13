@@ -43,38 +43,48 @@
 
 AgaveTaskReply::AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply * newReply, AgaveHandler *theManager, QObject *parent) : RemoteDataReply(parent)
 {
+    if (!performInitPointerCheck(theGuide, theManager)) return;
+    myReplyObject = newReply;
+
+    if ((myGuide->getRequestType() == AgaveRequestType::AGAVE_NONE) && (myReplyObject == nullptr))
+
+    if (myReplyObject == nullptr)
+    {
+        QObject::connect(myReplyObject, SIGNAL(finished()), this, SLOT(rawHttpTaskComplete()));
+    }
+
+    if ( && )
+    {
+        setDelayedDatalessReply(RequestState::INTERNAL_ERROR);
+        return;
+    }
+
+
+}
+
+AgaveTaskReply::AgaveTaskReply(AgaveTaskGuide * theGuide, RequestState passThruErrorState, AgaveHandler * theManager, QObject *parent) : RemoteDataReply(parent)
+{
+    if (!performInitPointerCheck(theGuide, theManager)) return;
+    setDelayedDatalessReply(passThruErrorState);
+}
+
+bool AgaveTaskReply::performInitPointerCheck(AgaveTaskGuide * theGuide, AgaveHandler * theManager)
+{
     myManager = theManager;
     myGuide = theGuide;
-    myReplyObject = newReply;
-    pendingReply = RequestState::INTERNAL_ERROR;
 
     if (myManager == nullptr)
     {
-        delayedPassThruReply(RequestState::INTERNAL_ERROR);
-        return;
+        setDelayedDatalessReply(RequestState::INTERNAL_ERROR);
+        return false;
     }
 
     if (myGuide == nullptr)
     {
-        delayedPassThruReply(RequestState::UNKNOWN_TASK);
-        return;
+        setDelayedDatalessReply(RequestState::UNKNOWN_TASK);
+        return false;
     }
-
-    if ((myReplyObject == nullptr) && (myGuide->getRequestType() != AgaveRequestType::AGAVE_NONE))
-    {
-        delayedPassThruReply(RequestState::INTERNAL_ERROR);
-        return;
-    }
-
-    if (myGuide->getTaskID() == "waitAll")
-    {
-        pendingReply = RequestState::GOOD;
-    }
-
-    if (myReplyObject != nullptr)
-    {
-        QObject::connect(myReplyObject, SIGNAL(finished()), this, SLOT(rawTaskComplete()));
-    }
+    return true;
 }
 
 AgaveTaskReply::~AgaveTaskReply()
@@ -90,45 +100,13 @@ QMap<QString, QByteArray> * AgaveTaskReply::getTaskParamList()
     return &taskParamList;
 }
 
-void AgaveTaskReply::delayedPassThruReply(RequestState replyState)
+void AgaveTaskReply::setDelayedDatalessReply(RequestState replyState)
 {
-    delayedPassThruReply(replyState, QString());
-}
-
-void AgaveTaskReply::delayedPassThruReply(RequestState replyState, QString param1)
-{
-    if (usingPassThru) return;
-    usingPassThru = true;
-
     pendingReply = replyState;
-    if (param1 == nullptr)
-    {
-        pendingParam = "";
-    }
-    else
-    {
-        pendingParam = param1;
-    }
 
     QTimer * quickTimer = new QTimer(qobject_cast<QObject*>(this));
-    QObject::connect(quickTimer, SIGNAL(timeout()), this, SLOT(rawTaskComplete()));
+    QObject::connect(quickTimer, SIGNAL(timeout()), this, SLOT(rawPassThruTaskComplete()));
     quickTimer->start(1);
-}
-
-void AgaveTaskReply::invokePassThruReply()
-{
-    this->deleteLater();
-
-    if (pendingReply == RequestState::GOOD)
-    {
-        if (myGuide->getTaskID() == "changeDir")
-        {
-            emit haveCurrentRemoteDir(pendingReply, pendingParam);
-            return;
-        }
-    }
-
-    processDatalessReply(pendingReply);
 }
 
 AgaveTaskGuide * AgaveTaskReply::getTaskGuide()
@@ -220,19 +198,31 @@ void AgaveTaskReply::processDatalessReply(RequestState replyState)
 
 }
 
-void AgaveTaskReply::rawTaskComplete()
+void AgaveTaskReply::rawNoDataNoHttpTaskComplete(RequestState replyState)
 {
-    if (!myGuide->isInternal())
+    if (myGuide->getRequestType() != AgaveRequestType::AGAVE_NONE)
     {
-        signalConnectDelay();
+        qCDebug(remoteInterface, "ERROR: no-http no-data reply signaled for wrong task type");
+        processDatalessReply(RequestState::INTERNAL_ERROR);
     }
+    processDatalessReply(replyState);
+}
+
+void AgaveTaskReply::rawPassThruTaskComplete()
+{
+    processDatalessReply(pendingReply);
+}
+
+void AgaveTaskReply::rawHttpTaskComplete()
+{
+    signalConnectDelay();
 
     this->deleteLater();
 
-    if ((myGuide->getRequestType() == AgaveRequestType::AGAVE_NONE) ||
-            (usingPassThru == true) || (myReplyObject == nullptr))
+    if (myReplyObject == nullptr)
     {
-        invokePassThruReply();
+        qCDebug(remoteInterface, "ERROR: http reply signaled without http request");
+        processDatalessReply(RequestState::INTERNAL_ERROR);
         return;
     }
 
