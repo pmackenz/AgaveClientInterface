@@ -38,16 +38,18 @@
 
 #include "../remotedatainterface.h"
 
+#include <QNetworkAccessManager>
+
 class AgaveTaskReply;
 
 class AgaveThread : public RemoteDataThread
 {
     Q_OBJECT
 public:
-    AgaveThread(QObject * parent);
+    AgaveThread(QObject * parent = nullptr);
 
     void registerAgaveAppInfo(QString agaveAppName, QString fullAgaveName, QStringList parameterList, QStringList inputList, QString workingDirParameter);
-    void sendCounterPing(QString urlForPing);
+    void setAgaveConnectionParams(QString tenant, QString clientId, QString storage);
 
     AgaveTaskReply * getAgaveAppList();
 
