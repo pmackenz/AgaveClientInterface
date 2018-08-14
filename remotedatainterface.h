@@ -109,7 +109,6 @@ public:
 
 public slots:
     virtual QString getUserName() = 0;
-    virtual bool isDisconnected() = 0;
 
     //Defaults to directory root,
     //Subsequent commands with remote folder names are either absolute paths
@@ -135,13 +134,13 @@ public slots:
     virtual RemoteDataReply * downloadFile(QString localDest, QString remoteName) = 0;
     virtual RemoteDataReply * downloadBuffer(QString remoteName) = 0;
 
-    virtual RemoteDataReply * runRemoteJob(QString jobName, ParamMap jobParameters, QString remoteWorkingDir, QString indivJobName = "") = 0;
+    virtual RemoteDataReply * runRemoteJob(QString jobName, ParamMap jobParameters, QString remoteWorkingDir, QString indivJobName = "", QString archivePath = "") = 0;
 
     virtual RemoteDataReply * getListOfJobs() = 0;
     virtual RemoteDataReply * getJobDetails(QString IDstr) = 0;
     virtual RemoteDataReply * stopJob(QString IDstr) = 0;
 
-    virtual RemoteDataInterfaceState getInterfaceState();
+    virtual RemoteDataInterfaceState getInterfaceState() = 0;
 
     static QString interpretRequestState(RequestState theState);
     static QString removeDoubleSlashes(QString stringIn);
@@ -168,7 +167,6 @@ public:
     //Also, to be safe, RemoteDataReply objects show wait if not connected, in case they finish before
     //connection is made
     QString getUserName();
-    bool isDisconnected();
 
     RemoteDataReply * closeAllConnections();
 
@@ -188,7 +186,7 @@ public:
     RemoteDataReply * downloadFile(QString localDest, QString remoteName);
     RemoteDataReply * downloadBuffer(QString remoteName);
 
-    RemoteDataReply * runRemoteJob(QString jobName, QMap<QString, QString> jobParameters, QString remoteWorkingDir, QString indivJobName = "");
+    RemoteDataReply * runRemoteJob(QString jobName, QMap<QString, QString> jobParameters, QString remoteWorkingDir, QString indivJobName = "", QString archivePath = "");
 
     RemoteDataReply * getListOfJobs();
     RemoteDataReply * getJobDetails(QString IDstr);

@@ -51,6 +51,8 @@ class AgaveTaskReply : public RemoteDataReply
 {
     Q_OBJECT
 
+    friend class AgaveHandler;
+
 public:
     explicit AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply *newReply, AgaveHandler * theManager, QObject *parent = nullptr);
     explicit AgaveTaskReply(AgaveTaskGuide * theGuide, RequestState passThruErrorState, AgaveHandler * theManager, QObject *parent = nullptr);
@@ -80,8 +82,8 @@ signals:
     //Double-check that the data is all passed.
     void haveAgaveAppList(RequestState theGuide, QVariantList appsList);
 
-public slots:
-    void rawNoDataNoHttpTaskComplete(RequestState replyState);
+protected slots:
+    void rawNoDataNoHttpTaskComplete(RequestState replyState = RequestState::GOOD);
 
 private slots:
     void rawPassThruTaskComplete();
@@ -100,7 +102,8 @@ private:
     AgaveTaskGuide * myGuide = nullptr;
     QNetworkReply * myReplyObject = nullptr;
 
-    //No delayedDataless reply store:
+    //delayed dataless reply store:
+    bool hasPendingReply = false;
     RequestState pendingReply = RequestState::INTERNAL_ERROR;
 
     QMap<QString, QByteArray> taskParamList;
