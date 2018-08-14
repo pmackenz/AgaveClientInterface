@@ -50,6 +50,8 @@ QString RemoteDataInterface::interpretRequestState(RequestState theState)
         return "Request In Progress";
     case RequestState::INTERNAL_ERROR:
         return "Internal error creating reply object";
+    case RequestState::INVALID_STATE:
+        return "Network interface method invoked in invalid state";
     case RequestState::UNKNOWN_TASK:
         return "Task for reply is not recognized";
     case RequestState::SIGNAL_OBJ_MISMATCH:
@@ -94,6 +96,24 @@ QString RemoteDataInterface::interpretRequestState(RequestState theState)
         return "Task stopped by user";
     }
     return "INTERNAL ERROR";
+}
+
+QString RemoteDataInterface::removeDoubleSlashes(QString stringIn)
+{
+    QString ret;
+
+    for (int i = 0; i < stringIn.size(); i++)
+    {
+        if (stringIn[i] != '/')
+        {
+            ret.append(stringIn[i]);
+        }
+        else if ((i == stringIn.length() - 1) || (stringIn[i + 1] != '/'))
+        {
+            ret.append(stringIn[i]);
+        }
+    }
+    return ret;
 }
 
 RemoteDataReply::RemoteDataReply(QObject * parent):QObject(parent) {}
@@ -142,29 +162,6 @@ QString RemoteDataThread::getUserName()
     QString retVal;
     QMetaObject::invokeMethod(myInterface, "getUserName", Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(QString, retVal));
-    return retVal;
-}
-
-bool RemoteDataThread::isDisconnected()
-{
-    QMutexLocker lock(&readyLock);
-
-    if (!remoteThreadReady()) return false;
-    bool retVal = false;
-    QMetaObject::invokeMethod(myInterface, "isDisconnected", Qt::BlockingQueuedConnection,
-                              Q_RETURN_ARG(bool, retVal));
-    return retVal;
-}
-
-RemoteDataReply * RemoteDataThread::setCurrentRemoteWorkingDirectory(QString cd)
-{
-    QMutexLocker lock(&readyLock);
-
-    if (!remoteThreadReady()) return nullptr;
-    RemoteDataReply * retVal = nullptr;
-    QMetaObject::invokeMethod(myInterface, "setCurrentRemoteWorkingDirectory", Qt::BlockingQueuedConnection,
-                              Q_RETURN_ARG(RemoteDataReply *, retVal),
-                              Q_ARG(QString, cd));
     return retVal;
 }
 
@@ -320,7 +317,7 @@ RemoteDataReply * RemoteDataThread::downloadBuffer(QString remoteName)
     return retVal;
 }
 
-RemoteDataReply * RemoteDataThread::runRemoteJob(QString jobName, QMap<QString, QString> jobParameters, QString remoteWorkingDir, QString indivJobName)
+RemoteDataReply * RemoteDataThread::runRemoteJob(QString jobName, QMap<QString, QString> jobParameters, QString remoteWorkingDir, QString indivJobName, QString archivePath)
 {
     QMutexLocker lock(&readyLock);
 
@@ -331,7 +328,8 @@ RemoteDataReply * RemoteDataThread::runRemoteJob(QString jobName, QMap<QString, 
                               Q_ARG(QString, jobName),
                               Q_ARG(ParamMap, jobParameters),
                               Q_ARG(QString, remoteWorkingDir),
-                              Q_ARG(QString, indivJobName));
+                              Q_ARG(QString, indivJobName),
+                              Q_ARG(QString, archivePath));
     return retVal;
 }
 

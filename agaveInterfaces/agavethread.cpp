@@ -51,13 +51,15 @@ void AgaveThread::registerAgaveAppInfo(QString agaveAppName, QString fullAgaveNa
                               Q_ARG(QString, workingDirParameter));
 }
 
-void AgaveThread::sendCounterPing(QString urlForPing)
+void AgaveThread::setAgaveConnectionParams(QString tenant, QString clientId, QString storage)
 {
     QMutexLocker lock(&readyLock);
 
     if (!remoteThreadReady()) return;
-    QMetaObject::invokeMethod(myInterface, "sendCounterPing", Qt::BlockingQueuedConnection,
-                              Q_ARG(QString, urlForPing));
+    QMetaObject::invokeMethod(myInterface, "setAgaveConnectionParams", Qt::BlockingQueuedConnection,
+                              Q_ARG(QString, tenant),
+                              Q_ARG(QString, clientId),
+                              Q_ARG(QString, storage));
 }
 
 AgaveTaskReply * AgaveThread::getAgaveAppList()
@@ -85,7 +87,9 @@ AgaveTaskReply * AgaveThread::runAgaveJob(QJsonDocument rawJobJSON)
 
 void AgaveThread::run()
 {
-    AgaveHandler theInterface;
+    QNetworkAccessManager theNetManager;
+
+    AgaveHandler theInterface(&theNetManager);
     myInterface = &theInterface;
 
     RemoteDataThread::run();

@@ -38,6 +38,7 @@
 
 #include "../remotedatainterface.h"
 
+#include <QObject>
 #include <QNetworkReply>
 #include <QHttpMultiPart>
 #include <QFile>
@@ -49,7 +50,6 @@ enum class AgaveRequestType {AGAVE_GET, AGAVE_POST, AGAVE_DELETE, AGAVE_UPLOAD, 
 
 class AgaveTaskGuide;
 class AgaveTaskReply;
-//class AgaveLongRunning;
 
 class AgaveHandler : public RemoteDataInterface
 {
@@ -58,21 +58,15 @@ class AgaveHandler : public RemoteDataInterface
     friend class AgaveTaskReply;
 
 public:
-    explicit AgaveHandler();
+    explicit AgaveHandler(QNetworkAccessManager * netAccessManager, QObject * parent = nullptr);
     ~AgaveHandler();
 
     virtual QString getUserName();
-    virtual bool isDisconnected();
-
     virtual RemoteDataReply * closeAllConnections();
-
-    //Defaults to directory root,
-    //Subsequent commands with remote folder names are either absolute paths
-    //or reletive to the current working directory
-    virtual RemoteDataReply * setCurrentRemoteWorkingDirectory(QString cd);
 
     //Remote tasks to be implemented in subclasses:
     //Returns a RemoteDataReply, which should have the correct signal attached to an appropriate slot
+    //These methods should NEVER return null
     virtual RemoteDataReply * performAuth(QString uname, QString passwd);
 
     virtual RemoteDataReply * remoteLS(QString dirPath);
@@ -89,17 +83,13 @@ public:
     virtual RemoteDataReply * downloadFile(QString localDest, QString remoteName);
     virtual RemoteDataReply * downloadBuffer(QString remoteName);
 
-    virtual RemoteDataReply * runRemoteJob(QString jobName, ParamMap jobParameters, QString remoteWorkingDir, QString indivJobName = "");
+    virtual RemoteDataReply * runRemoteJob(QString jobName, ParamMap jobParameters, QString remoteWorkingDir, QString indivJobName = "", QString archivePath = "");
 
     virtual RemoteDataReply * getListOfJobs();
     virtual RemoteDataReply * getJobDetails(QString IDstr);
     virtual RemoteDataReply * stopJob(QString IDstr);
 
-    //-----------------------------------------
-    //Agave Specific Functions:
-
-    QString getTenantURL();
-    bool inShutdownMode();
+    virtual RemoteDataInterfaceState getInterfaceState();
 
 public slots:
     //On Agave Apps:
@@ -112,7 +102,8 @@ public slots:
     //For debugging purposes, to retrive the list of available Agave Apps:
     AgaveTaskReply * getAgaveAppList();
 
-    void sendCounterPing(QString urlForPing);
+    void setAgaveConnectionParams(QString tenant, QString clientId, QString storage);
+
     RemoteDataReply * runAgaveJob(QJsonDocument rawJobJSON);
 
 signals:
@@ -120,35 +111,37 @@ signals:
 
 protected:
     void handleInternalTask(AgaveTaskReply *agaveReply, QNetworkReply * rawReply);
+    void handleInternalTask(AgaveTaskReply *agaveReply, RequestState taskState);
 
 private slots:
     void finishedOneTask();
 
 private:
     AgaveTaskReply * performAgaveQuery(QString queryName);
-    AgaveTaskReply * performAgaveQuery(QString queryName, QMap<QString, QByteArray> varList, QObject *parentReq = nullptr);
+    AgaveTaskReply * performAgaveQuery(QString queryName, QMap<QString, QByteArray> varList, AgaveTaskReply *parentReq = nullptr);
+    AgaveTaskReply * createErrorReply(AgaveTaskGuide * theTaskType, RequestState errorState, AgaveTaskReply *parentReq = nullptr);
+    AgaveTaskReply * createErrorReply(QString theTaskType, RequestState errorState, AgaveTaskReply *parentReq = nullptr);
 
     QNetworkReply * distillRequestData(AgaveTaskGuide * theGuide, QMap<QString, QByteArray> * varList);
     QNetworkReply * finalizeAgaveRequest(AgaveTaskGuide * theGuide, QString urlAppend, QByteArray * authHeader = nullptr, QByteArray postData = "", QIODevice * fileHandle = nullptr);
 
     void forwardReplyToParent(AgaveTaskReply * agaveReply, RequestState replyState);
-    void forwardReplyToParent(AgaveTaskReply * agaveReply, RequestState replyState, QString param1);
 
-    void clearAllAuthTokens();
+    bool noPendingHttpRequests();
+    void changeAuthState(RemoteDataInterfaceState newState);
 
     void setupTaskGuideList();
     void insertAgaveTaskGuide(AgaveTaskGuide * newGuide);
     AgaveTaskGuide * retriveTaskGuide(QString taskID);
 
-    QString getPathReletiveToCWD(QString inputPath);
+    static bool remotePathStringIsValid(QString toCheck);
 
-    static QString removeDoubleSlashes(QString stringIn);
-
-    QNetworkAccessManager networkHandle;
+    QNetworkAccessManager * networkHandle;
     QSslConfiguration SSLoptions;
-    const QString tenantURL = "https://agave.designsafe-ci.org";
-    const QString clientName = "SimCenter_CWE_GUI";
-    const QString storageNode = "designsafe.storage.default";
+
+    QString tenantURL;
+    QString clientName;
+    QString storageNode;
 
     QByteArray authEncoded;
     QByteArray clientEncoded;
@@ -166,9 +159,7 @@ private:
     QString pwd = "";
 
     int pendingRequestCount = 0;
-    bool performingShutdown = false;
-    bool authGained = false;
-    bool attemptingAuth = false;
+    RemoteDataInterfaceState currentState = RemoteDataInterfaceState::INIT;
 };
 
 #endif // AGAVEHANDLER_H

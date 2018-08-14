@@ -38,43 +38,61 @@
 #include "agavehandler.h"
 #include "agavetaskguide.h"
 
-#include "../AgaveClientInterface/filemetadata.h"
-#include "../AgaveClientInterface/remotejobdata.h"
+#include "filemetadata.h"
+#include "remotejobdata.h"
 
 AgaveTaskReply::AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply * newReply, AgaveHandler *theManager, QObject *parent) : RemoteDataReply(parent)
 {
-    myManager = theManager;
-    myGuide = theGuide;
+    if (!performInitPointerCheck(theGuide, theManager)) return;
     myReplyObject = newReply;
-    pendingReply = RequestState::INTERNAL_ERROR;
 
-    if (myManager == nullptr)
+    if ((myGuide->getRequestType() == AgaveRequestType::AGAVE_NONE) && (myReplyObject == nullptr))
     {
-        delayedPassThruReply(RequestState::INTERNAL_ERROR);
         return;
     }
 
-    if (myGuide == nullptr)
+    if ((myGuide->getRequestType() == AgaveRequestType::AGAVE_NONE) && (myReplyObject != nullptr))
     {
-        delayedPassThruReply(RequestState::UNKNOWN_TASK);
+        qCDebug(remoteInterface, "Agave Task type that does not use QNetworkReply improperly given a QNetworkReply");
+        myReplyObject->deleteLater();
+        setDelayedDatalessReply(RequestState::INTERNAL_ERROR);
         return;
-    }
-
-    if ((myReplyObject == nullptr) && (myGuide->getRequestType() != AgaveRequestType::AGAVE_NONE))
-    {
-        delayedPassThruReply(RequestState::INTERNAL_ERROR);
-        return;
-    }
-
-    if (myGuide->getTaskID() == "waitAll")
-    {
-        pendingReply = RequestState::GOOD;
     }
 
     if (myReplyObject != nullptr)
     {
-        QObject::connect(myReplyObject, SIGNAL(finished()), this, SLOT(rawTaskComplete()));
+        QObject::connect(myReplyObject, SIGNAL(finished()), this, SLOT(rawHttpTaskComplete()));
     }
+    else
+    {
+        qCDebug(remoteInterface, "Agave Task type that uses QNetworkReply not given a QNetworkReply");
+        setDelayedDatalessReply(RequestState::INTERNAL_ERROR);
+    }
+}
+
+AgaveTaskReply::AgaveTaskReply(AgaveTaskGuide * theGuide, RequestState passThruErrorState, AgaveHandler * theManager, QObject *parent) : RemoteDataReply(parent)
+{
+    if (!performInitPointerCheck(theGuide, theManager)) return;
+    setDelayedDatalessReply(passThruErrorState);
+}
+
+bool AgaveTaskReply::performInitPointerCheck(AgaveTaskGuide * theGuide, AgaveHandler * theManager)
+{
+    myManager = theManager;
+    myGuide = theGuide;
+
+    if (myManager == nullptr)
+    {
+        setDelayedDatalessReply(RequestState::INTERNAL_ERROR);
+        return false;
+    }
+
+    if (myGuide == nullptr)
+    {
+        setDelayedDatalessReply(RequestState::UNKNOWN_TASK);
+        return false;
+    }
+    return true;
 }
 
 AgaveTaskReply::~AgaveTaskReply()
@@ -90,45 +108,13 @@ QMap<QString, QByteArray> * AgaveTaskReply::getTaskParamList()
     return &taskParamList;
 }
 
-void AgaveTaskReply::delayedPassThruReply(RequestState replyState)
+void AgaveTaskReply::setDelayedDatalessReply(RequestState replyState)
 {
-    delayedPassThruReply(replyState, QString());
-}
-
-void AgaveTaskReply::delayedPassThruReply(RequestState replyState, QString param1)
-{
-    if (usingPassThru) return;
-    usingPassThru = true;
-
     pendingReply = replyState;
-    if (param1 == nullptr)
-    {
-        pendingParam = "";
-    }
-    else
-    {
-        pendingParam = param1;
-    }
 
     QTimer * quickTimer = new QTimer(qobject_cast<QObject*>(this));
-    QObject::connect(quickTimer, SIGNAL(timeout()), this, SLOT(rawTaskComplete()));
+    QObject::connect(quickTimer, SIGNAL(timeout()), this, SLOT(rawPassThruTaskComplete()));
     quickTimer->start(1);
-}
-
-void AgaveTaskReply::invokePassThruReply()
-{
-    this->deleteLater();
-
-    if (pendingReply == RequestState::GOOD)
-    {
-        if (myGuide->getTaskID() == "changeDir")
-        {
-            emit haveCurrentRemoteDir(pendingReply, pendingParam);
-            return;
-        }
-    }
-
-    processDatalessReply(pendingReply);
 }
 
 AgaveTaskGuide * AgaveTaskReply::getTaskGuide()
@@ -220,26 +206,70 @@ void AgaveTaskReply::processDatalessReply(RequestState replyState)
 
 }
 
-void AgaveTaskReply::rawTaskComplete()
+void AgaveTaskReply::rawNoDataNoHttpTaskComplete(RequestState replyState)
 {
-    if (!myGuide->isInternal())
-    {
-        signalConnectDelay();
-    }
-
     this->deleteLater();
 
-    if ((myGuide->getRequestType() == AgaveRequestType::AGAVE_NONE) ||
-            (usingPassThru == true) || (myReplyObject == nullptr))
+    //If this task is an INTERNAL task, then the result is redirected to the manager
+    if (myGuide->isInternal())
     {
-        invokePassThruReply();
+        myManager->handleInternalTask(this, replyState);
         return;
     }
 
-    if ((myManager->inShutdownMode()) && (myGuide->getTaskID() != "authRevoke"))
+    if (myGuide->getRequestType() != AgaveRequestType::AGAVE_NONE)
     {
-        qCDebug(remoteInterface, "Request during shutdown ignored");
+        qCDebug(remoteInterface, "ERROR: no-http no-data reply signaled for wrong task type");
+        processDatalessReply(RequestState::INTERNAL_ERROR);
+    }
+    signalConnectDelay();
+    processDatalessReply(replyState);
+}
+
+void AgaveTaskReply::rawPassThruTaskComplete()
+{
+    this->deleteLater();
+
+    //If this task is an INTERNAL task, then the result is redirected to the manager
+    if (myGuide->isInternal())
+    {
+        myManager->handleInternalTask(this, pendingReply);
         return;
+    }
+
+    signalConnectDelay();
+    processDatalessReply(pendingReply);
+}
+
+void AgaveTaskReply::rawHttpTaskComplete()
+{
+    this->deleteLater();
+
+    //If this task is an INTERNAL task, then the result is redirected to the manager
+    if (myGuide->isInternal())
+    {
+        myManager->handleInternalTask(this, myReplyObject);
+        return;
+    }
+
+    signalConnectDelay();
+
+    if (myReplyObject == nullptr)
+    {
+        qCDebug(remoteInterface, "ERROR: http reply signaled without http request");
+        processDatalessReply(RequestState::INTERNAL_ERROR);
+        return;
+    }
+
+    if (myGuide->getTaskID() != "authRevoke")
+    {
+        if ((myManager->getInterfaceState() == RemoteDataInterfaceState::DISCONNECTING) ||
+                (myManager->getInterfaceState() == RemoteDataInterfaceState::DISCONNECTED))
+        {
+            qCDebug(remoteInterface, "Request during disconnect ignored");
+            processDatalessReply(RequestState::INVALID_STATE);
+            return;
+        }
     }
 
     QNetworkReply * testReply = qobject_cast<QNetworkReply *>(sender());
@@ -248,13 +278,6 @@ void AgaveTaskReply::rawTaskComplete()
         processDatalessReply(RequestState::SIGNAL_OBJ_MISMATCH);
         return;
     }    
-
-    //If this task is an INTERNAL task, then the result is redirected to the manager
-    if (myGuide->isInternal())
-    {
-        myManager->handleInternalTask(this, myReplyObject);
-        return;
-    }
 
     if (testReply->error() != QNetworkReply::NoError)
     {

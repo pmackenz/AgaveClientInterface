@@ -50,11 +50,10 @@ Q_DECLARE_METATYPE(ParamMap)
 Q_DECLARE_LOGGING_CATEGORY(remoteInterface)
 Q_DECLARE_LOGGING_CATEGORY(rawHTTP)
 
-//Good means the request was good and
-//Fail means the remote service replied, but did not like the request, for some reason
-//No Connect means that the request did not get thru to the remote service at all
+enum class RemoteDataInterfaceState {INIT, READY, AUTH_TRY, CONNECTED, DISCONNECTING, DISCONNECTED};
+
 enum class RequestState {GOOD, PENDING,
-                         UNKNOWN_TASK, INTERNAL_ERROR,
+                         UNKNOWN_TASK, INTERNAL_ERROR, INVALID_STATE,
                          SIGNAL_OBJ_MISMATCH, SERVICE_UNAVAILABLE,
                          LOST_INTERNET, DROPPED_CONNECTION,
                          NO_CHANGE_DIR, FILE_NOT_FOUND,
@@ -110,16 +109,15 @@ public:
 
 public slots:
     virtual QString getUserName() = 0;
-    virtual bool isDisconnected() = 0;
 
     //Defaults to directory root,
     //Subsequent commands with remote folder names are either absolute paths
     //or reletive to the current working directory
-    virtual RemoteDataReply * setCurrentRemoteWorkingDirectory(QString cd) = 0;
     virtual RemoteDataReply * closeAllConnections() = 0;
 
     //Remote tasks to be implemented in subclasses:
     //Returns a RemoteDataReply, which should have the correct signal attached to an appropriate slot
+    //These methods should ALWAYS return a valid pointer
     virtual RemoteDataReply * performAuth(QString uname, QString passwd) = 0;
 
     virtual RemoteDataReply * remoteLS(QString dirPath) = 0;
@@ -136,13 +134,16 @@ public slots:
     virtual RemoteDataReply * downloadFile(QString localDest, QString remoteName) = 0;
     virtual RemoteDataReply * downloadBuffer(QString remoteName) = 0;
 
-    virtual RemoteDataReply * runRemoteJob(QString jobName, ParamMap jobParameters, QString remoteWorkingDir, QString indivJobName = "") = 0;
+    virtual RemoteDataReply * runRemoteJob(QString jobName, ParamMap jobParameters, QString remoteWorkingDir, QString indivJobName = "", QString archivePath = "") = 0;
 
     virtual RemoteDataReply * getListOfJobs() = 0;
     virtual RemoteDataReply * getJobDetails(QString IDstr) = 0;
     virtual RemoteDataReply * stopJob(QString IDstr) = 0;
 
+    virtual RemoteDataInterfaceState getInterfaceState() = 0;
+
     static QString interpretRequestState(RequestState theState);
+    static QString removeDoubleSlashes(QString stringIn);
 };
 
 class RemoteDataThread : public QThread
@@ -166,9 +167,7 @@ public:
     //Also, to be safe, RemoteDataReply objects show wait if not connected, in case they finish before
     //connection is made
     QString getUserName();
-    bool isDisconnected();
 
-    RemoteDataReply * setCurrentRemoteWorkingDirectory(QString cd);
     RemoteDataReply * closeAllConnections();
 
     RemoteDataReply * performAuth(QString uname, QString passwd);
@@ -187,7 +186,7 @@ public:
     RemoteDataReply * downloadFile(QString localDest, QString remoteName);
     RemoteDataReply * downloadBuffer(QString remoteName);
 
-    RemoteDataReply * runRemoteJob(QString jobName, QMap<QString, QString> jobParameters, QString remoteWorkingDir, QString indivJobName = "");
+    RemoteDataReply * runRemoteJob(QString jobName, QMap<QString, QString> jobParameters, QString remoteWorkingDir, QString indivJobName = "", QString archivePath = "");
 
     RemoteDataReply * getListOfJobs();
     RemoteDataReply * getJobDetails(QString IDstr);
