@@ -8,7 +8,14 @@ SOURCES += \
     $$PWD/remotedatainterface.cpp \
     $$PWD/filemetadata.cpp \
     $$PWD/remotejobdata.cpp \
-    $$PWD/agaveInterfaces/agavethread.cpp
+    $$PWD/agaveInterfaces/agavethread.cpp \
+    $$PWD/remoteFiles/filenoderef.cpp \
+    $$PWD/remoteFiles/fileoperator.cpp \
+    $$PWD/remoteFiles/filetreenode.cpp \
+    $$PWD/remoteFiles/remotefileitem.cpp \
+    $$PWD/remoteFiles/remotefilemodel.cpp \
+    $$PWD/remoteFiles/remotefiletree.cpp \
+    $$PWD/remoteFiles/selectedfilelabel.cpp
 
 HEADERS += \
     $$PWD/agaveInterfaces/agavehandler.h \
@@ -19,4 +26,11 @@ HEADERS += \
     $$PWD/remotejobdata.h \
     $$PWD/agaveInterfaces/agavepipebuffer.h \
     $$PWD/agaveInterfaces/agavethread.h \
+    $$PWD/remoteFiles/filenoderef.h \
+    $$PWD/remoteFiles/fileoperator.h \
+    $$PWD/remoteFiles/filetreenode.h \
+    $$PWD/remoteFiles/remotefileitem.h \
+    $$PWD/remoteFiles/remotefilemodel.h \
+    $$PWD/remoteFiles/remotefiletree.h \
+    $$PWD/remoteFiles/selectedfilelabel.h
 
