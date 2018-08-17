@@ -37,7 +37,7 @@
 #define SELECTEDFILELABEL_H
 
 #include <QLabel>
-#include "remoteFileOps/filenoderef.h"
+#include "filenoderef.h"
 
 class FileTreeNode;
 class RemoteFileTree;

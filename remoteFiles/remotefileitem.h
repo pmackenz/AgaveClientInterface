@@ -38,7 +38,7 @@
 
 #include <QStandardItem>
 
-#include "remoteFileOps/filenoderef.h"
+#include "filenoderef.h"
 
 class RemoteFileItem : public QStandardItem
 {

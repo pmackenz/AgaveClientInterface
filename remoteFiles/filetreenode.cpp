@@ -42,7 +42,6 @@
 
 #include "filemetadata.h"
 #include "remotedatainterface.h"
-#include "ae_globals.h"
 
 FileTreeNode::FileTreeNode(FileMetaData contents, FileTreeNode * parent):QObject(qobject_cast<QObject *>(parent))
 {

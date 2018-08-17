@@ -35,7 +35,7 @@
 
 #include "fileoperator.h"
 
-#include "remoteModelViews/remotefiletree.h"
+#include "remotefiletree.h"
 #include "filetreenode.h"
 #include "easyboollock.h"
 #include "filenoderef.h"
@@ -44,7 +44,6 @@
 #include "remotedatainterface.h"
 
 #include "utilFuncs/agavesetupdriver.h"
-#include "ae_globals.h"
 
 FileOperator::FileOperator(AgaveSetupDriver *parent) : QObject( qobject_cast<QObject *>(parent))
 {

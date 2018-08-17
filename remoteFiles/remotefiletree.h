@@ -39,7 +39,7 @@
 #include <QTreeView>
 #include <QStandardItem>
 
-#include "remoteFileOps/filenoderef.h"
+#include "filenoderef.h"
 
 //NOTE: FILENAME MUST == 0 for these functions to work.
 //The other columns can be changed

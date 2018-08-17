@@ -35,7 +35,6 @@
 
 #include "selectedfilelabel.h"
 
-#include "remoteFileOps/filetreenode.h"
 #include "remotefiletree.h"
 #include "filemetadata.h"
 

@@ -41,7 +41,7 @@
 #include <QStandardItem>
 #include <QHeaderView>
 
-#include "remoteFileOps/filenoderef.h"
+#include "filenoderef.h"
 
 class FileNodeRef;
 class FileOperator;

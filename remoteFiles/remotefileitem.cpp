@@ -33,9 +33,8 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
+#include "fileoperator.h"
 #include "remotefileitem.h"
-
-#include "ae_globals.h"
 
 RemoteFileItem::RemoteFileItem(bool isLoading) : QStandardItem()
 {
