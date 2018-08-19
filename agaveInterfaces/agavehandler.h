@@ -42,6 +42,7 @@
 #include <QNetworkReply>
 #include <QHttpMultiPart>
 #include <QFile>
+#include <QBuffer>
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -61,6 +62,7 @@ public:
     explicit AgaveHandler(QNetworkAccessManager * netAccessManager, QObject * parent = nullptr);
     ~AgaveHandler();
 
+public slots:
     virtual QString getUserName();
     virtual RemoteDataReply * closeAllConnections();
 
@@ -91,7 +93,6 @@ public:
 
     virtual RemoteDataInterfaceState getInterfaceState();
 
-public slots:
     //On Agave Apps:
     //Register info on the Agave App's parameters, using:
     void registerAgaveAppInfo(QString agaveAppName, QString fullAgaveName, QStringList parameterList, QStringList inputList, QString workingDirParameter);

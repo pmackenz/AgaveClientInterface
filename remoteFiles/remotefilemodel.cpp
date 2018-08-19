@@ -41,13 +41,10 @@
 #include "fileoperator.h"
 #include "filetreenode.h"
 
-RemoteFileModel::RemoteFileModel() : QObject()
+RemoteFileModel::RemoteFileModel(QObject * parent) : QObject(parent)
 {
     theModel.setColumnCount(tableNumCols);
     theModel.setHorizontalHeaderLabels(shownHeaderLabelList);
-
-    QObject::connect(ae_globals::get_file_handle(), SIGNAL(fileSystemChange(FileNodeRef)),
-                     this, SLOT(newFileData(FileNodeRef)), Qt::QueuedConnection);
 }
 
 RemoteFileItem * RemoteFileModel::getItemByFile(FileNodeRef toFind)
@@ -210,7 +207,7 @@ RemoteFileItem * RemoteFileModel::findParentItem(FileNodeRef toFind)
     QString firstPath = fileParts.takeFirst();
     if (userRoot->getFile().getFileName() != firstPath)
     {
-        ae_globals::displayFatalPopup("ERROR: files given to remote file model from a different user folder.","Internal Error");
+        qCDebug(fileManager, "ERROR: files given to remote file model from a different user folder.");
         return nullptr;
     }
 

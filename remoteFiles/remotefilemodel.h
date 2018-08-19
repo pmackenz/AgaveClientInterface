@@ -55,7 +55,7 @@ class RemoteFileModel : public QObject
     friend class RemoteFileTree;
 
 public:
-    RemoteFileModel();
+    RemoteFileModel(QObject *parent = nullptr);
 
 protected:
     RemoteFileItem * getItemByFile(FileNodeRef toFind);

@@ -43,6 +43,7 @@
 #include <QMutex>
 #include <QJsonDocument>
 #include <QLoggingCategory>
+#include <QNetworkAccessManager>
 
 typedef QMap<QString, QString> ParamMap;
 Q_DECLARE_METATYPE(ParamMap)
@@ -144,65 +145,6 @@ public slots:
 
     static QString interpretRequestState(RequestState theState);
     static QString removeDoubleSlashes(QString stringIn);
-};
-
-class RemoteDataThread : public QThread
-{
-    Q_OBJECT
-
-public:
-    RemoteDataThread(QObject * parent);
-
-    bool interfaceReady();
-
-    //All of the following meta-invoke the same using the relevant
-    //RemoteDataInterface within this QThread
-    //Must invoke start before calling any of them
-
-    //Also, this assumes that the underlying RemoteDataInterface protects the given slots
-    //With mutexes or Read/Write locks if needed.
-    //If, however, nothing can touch the RemoteDataInterface outside this thread, that should not be needed,
-    //Since the event queue provides protection
-
-    //Also, to be safe, RemoteDataReply objects show wait if not connected, in case they finish before
-    //connection is made
-    QString getUserName();
-
-    RemoteDataReply * closeAllConnections();
-
-    RemoteDataReply * performAuth(QString uname, QString passwd);
-
-    RemoteDataReply * remoteLS(QString dirPath);
-
-    RemoteDataReply * deleteFile(QString toDelete);
-    RemoteDataReply * moveFile(QString from, QString to);
-    RemoteDataReply * copyFile(QString from, QString to);
-    RemoteDataReply * renameFile(QString fullName, QString newName);
-
-    RemoteDataReply * mkRemoteDir(QString location, QString newName);
-
-    RemoteDataReply * uploadFile(QString location, QString localFileName);
-    RemoteDataReply * uploadBuffer(QString location, QByteArray fileData, QString newFileName);
-    RemoteDataReply * downloadFile(QString localDest, QString remoteName);
-    RemoteDataReply * downloadBuffer(QString remoteName);
-
-    RemoteDataReply * runRemoteJob(QString jobName, QMap<QString, QString> jobParameters, QString remoteWorkingDir, QString indivJobName = "", QString archivePath = "");
-
-    RemoteDataReply * getListOfJobs();
-    RemoteDataReply * getJobDetails(QString IDstr);
-    RemoteDataReply * stopJob(QString IDstr);
-
-protected:
-    //In subclass, run() method should point this to a
-    //stack variable within run
-    RemoteDataInterface * myInterface = nullptr;
-    QMutex readyLock;
-
-    virtual void run();
-    bool remoteThreadReady();
-
-private:
-    bool connectIsReady = false;
 };
 
 #endif // REMOTEDATAINTERFACE_H

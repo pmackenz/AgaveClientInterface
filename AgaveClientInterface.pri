@@ -4,11 +4,9 @@ SOURCES += \
     $$PWD/agaveInterfaces/agavehandler.cpp \
     $$PWD/agaveInterfaces/agavetaskguide.cpp \
     $$PWD/agaveInterfaces/agavetaskreply.cpp \
-    $$PWD/agaveInterfaces/agavepipebuffer.cpp \
     $$PWD/remotedatainterface.cpp \
     $$PWD/filemetadata.cpp \
     $$PWD/remotejobdata.cpp \
-    $$PWD/agaveInterfaces/agavethread.cpp \
     $$PWD/remoteFiles/filenoderef.cpp \
     $$PWD/remoteFiles/fileoperator.cpp \
     $$PWD/remoteFiles/filetreenode.cpp \
@@ -24,8 +22,6 @@ HEADERS += \
     $$PWD/remotedatainterface.h \
     $$PWD/filemetadata.h \
     $$PWD/remotejobdata.h \
-    $$PWD/agaveInterfaces/agavepipebuffer.h \
-    $$PWD/agaveInterfaces/agavethread.h \
     $$PWD/remoteFiles/filenoderef.h \
     $$PWD/remoteFiles/fileoperator.h \
     $$PWD/remoteFiles/filetreenode.h \

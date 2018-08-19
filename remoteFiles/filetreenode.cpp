@@ -45,11 +45,13 @@
 
 FileTreeNode::FileTreeNode(FileMetaData contents, FileTreeNode * parent):QObject(qobject_cast<QObject *>(parent))
 {
+    myParent = parent;
+    myFileOperator = myParent->myFileOperator;
+
     fileData.copyDataFrom(contents);
-    fileData.setFileOperator(parent->myFileOperator);
+    fileData.setFileOperator(myFileOperator);
     settimestamps();
 
-    myParent = parent;
     parent->childList.append(this);
 
     recomputeNodeState();
@@ -59,6 +61,7 @@ FileTreeNode::FileTreeNode(QString rootFolderName, FileOperator * theFileOperato
 {
     QString fullPath = "/";
     fullPath = fullPath.append(rootFolderName);
+    fullPath = RemoteDataInterface::removeDoubleSlashes(fullPath);
 
     myFileOperator = theFileOperator;
 
@@ -280,7 +283,8 @@ void FileTreeNode::deliverLSdata(RequestState taskState, QList<FileMetaData> dat
     }
     else
     {
-        ae_globals::displayPopup("Unable to connect to DesignSafe file server. If this problem persists, please contact DesignSafe.", "Connection Issue");
+        qCDebug(fileManager, "Unable to connect to DesignSafe file server for ls task.");
+        //TODO: switch folder contents to show connect error
     }
 
     recomputeNodeState();
@@ -313,7 +317,8 @@ void FileTreeNode::deliverBuffData(RequestState taskState, QByteArray bufferData
     }
     else
     {
-        ae_globals::displayPopup("Unable to connect to DesignSafe file server. If this problem persists, please contact DesignSafe.", "Connection Issue");
+        qCDebug(fileManager, "Unable to connect to DesignSafe file server for buffer task.");
+        //TODO: switch folder contents to show connect error
     }
     recomputeNodeState();
 }
@@ -418,7 +423,7 @@ void FileTreeNode::changeNodeState(NodeState newState)
         this->deleteLater();
     }
 
-    ae_globals::get_file_handle()->fileNodesChange(fileData);
+    myFileOperator->fileNodesChange(fileData);
 }
 
 void FileTreeNode::settimestamps()

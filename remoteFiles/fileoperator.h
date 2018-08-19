@@ -53,12 +53,10 @@ class FileTreeNode;
 class RemoteFileTree;
 class FileMetaData;
 class RemoteDataInterface;
-class EasyBoolLock;
-class AgaveSetupDriver;
 
 enum class RequestState;
 enum class NodeState;
-enum class FileOp_RecursiveTask {NONE, DOWNLOAD, UPLOAD};
+enum class FileOperatorState {IDLE, REC_UPLOAD, REC_DOWNLOAD, REC_UPLOAD_ACTIVE, ACTIVE};
 enum class RecursiveErrorCodes {NONE, MKDIR_FAIL, UPLOAD_FAIL, TYPE_MISSMATCH, LOST_FILE};
 
 class FileOperator : public QObject
@@ -69,15 +67,15 @@ class FileOperator : public QObject
     friend class FileNodeRef;
 
 public:
-    FileOperator(AgaveSetupDriver * parent);
+    FileOperator(QObject *parent);
     ~FileOperator();
 
+    void resetFileData(RemoteDataInterface *parent, QString rootFolder);
     void resetFileData();
 
     const FileNodeRef speculateFileWithName(QString fullPath, bool folder);
     const FileNodeRef speculateFileWithName(const FileNodeRef &baseNode, QString addedPath, bool folder);
 
-    void totalResetErrorProcedure();
     bool operationIsPending();
 
     void lsClosestNode(QString fullPath, bool clearData = false);
@@ -158,20 +156,21 @@ private:
     void recursiveUploadProcessRetry();
     bool recursiveUploadHelper(FileTreeNode * nodeToSend, QDir localPath, RecursiveErrorCodes &errNum); //Return true if all data sent and ls verified
 
-    bool sendRecursiveCreateFolderReq(FileTreeNode * selectedNode, QString newName);
-    bool sendRecursiveUploadReq(FileTreeNode * uploadTarget, QString localFile);
+    void sendRecursiveCreateFolderReq(FileTreeNode * selectedNode, QString newName);
+    void sendRecursiveUploadReq(FileTreeNode * uploadTarget, QString localFile);
 
     void emitStdFileOpErr(QString errString, RequestState errState);
 
+    RemoteDataInterface * myInterface = nullptr;
+    QString myRootFolderName;
+    FileOperatorState myState = FileOperatorState::IDLE;
+
     FileTreeNode * rootFileNode = nullptr;
 
-    EasyBoolLock * fileOpPending;
     FileTreeNode * rememberTargetFile;
 
-    EasyBoolLock * recursivefileOpPending;
     QDir recursiveLocalHead;
     FileTreeNode * recursiveRemoteHead;
-    FileOp_RecursiveTask currentRecursiveTask = FileOp_RecursiveTask::NONE;
 };
 
 #endif // FILEOPERATOR_H
