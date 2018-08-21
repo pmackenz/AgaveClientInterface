@@ -36,7 +36,7 @@
 #ifndef AGAVEHANDLER_H
 #define AGAVEHANDLER_H
 
-#include "../remotedatainterface.h"
+#include "remotedatainterface.h"
 
 #include <QObject>
 #include <QNetworkReply>

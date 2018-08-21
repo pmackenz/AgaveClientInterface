@@ -36,7 +36,7 @@
 #ifndef AGAVETASKREPLY_H
 #define AGAVETASKREPLY_H
 
-#include "../remotedatainterface.h"
+#include "remotedatainterface.h"
 
 #include <QNetworkReply>
 

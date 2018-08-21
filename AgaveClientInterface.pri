@@ -1,4 +1,4 @@
-INCLUDEPATH += "../AgaveClientInterface/"
+INCLUDEPATH += "$$PWD/"
 
 SOURCES += \
     $$PWD/agaveInterfaces/agavehandler.cpp \
@@ -13,7 +13,11 @@ SOURCES += \
     $$PWD/remoteFiles/remotefileitem.cpp \
     $$PWD/remoteFiles/remotefilemodel.cpp \
     $$PWD/remoteFiles/remotefiletree.cpp \
-    $$PWD/remoteFiles/selectedfilelabel.cpp
+    $$PWD/remoteFiles/selectedfilelabel.cpp \
+    $$PWD/remoteJobs/joblistnode.cpp \
+    $$PWD/remoteJobs/joboperator.cpp \
+    $$PWD/remoteJobs/linkedstandarditem.cpp \
+    $$PWD/remoteJobs/remotejoblister.cpp
 
 HEADERS += \
     $$PWD/agaveInterfaces/agavehandler.h \
@@ -28,5 +32,9 @@ HEADERS += \
     $$PWD/remoteFiles/remotefileitem.h \
     $$PWD/remoteFiles/remotefilemodel.h \
     $$PWD/remoteFiles/remotefiletree.h \
-    $$PWD/remoteFiles/selectedfilelabel.h
+    $$PWD/remoteFiles/selectedfilelabel.h \
+    $$PWD/remoteJobs/joblistnode.h \
+    $$PWD/remoteJobs/joboperator.h \
+    $$PWD/remoteJobs/linkedstandarditem.h \
+    $$PWD/remoteJobs/remotejoblister.h
 
