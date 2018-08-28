@@ -42,9 +42,9 @@
 
 Q_LOGGING_CATEGORY(jobManager, "Job Manager")
 
-JobOperator::JobOperator(RemoteDataInterface *parent) : QObject(qobject_cast<QObject *>(parent))
+JobOperator::JobOperator(QObject *parent) : QObject(qobject_cast<QObject *>(parent))
 {
-    myInterface = parent;
+    myInterface = nullptr;
     theJobList.setHorizontalHeaderLabels({"Task Name", "State", "Agave App", "Time Created", "Agave ID"});
 }
 
@@ -54,6 +54,13 @@ JobOperator::~JobOperator()
     {
         delete (*itr);
     }
+}
+
+void JobOperator::resetJobData(RemoteDataInterface * theDataInterface)
+{
+    myInterface = theDataInterface;
+    demandJobDataRefresh();
+    //TODO: Other reset stuff
 }
 
 void JobOperator::linkToJobLister(RemoteJobLister * newLister)

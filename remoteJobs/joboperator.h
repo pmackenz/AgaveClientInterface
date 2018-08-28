@@ -58,8 +58,10 @@ class JobOperator : public QObject
 {
     Q_OBJECT
 public:
-    explicit JobOperator(RemoteDataInterface * parent);
+    explicit JobOperator(QObject * parent);
     ~JobOperator();
+
+    void resetJobData(RemoteDataInterface * theDataInterface);
     void linkToJobLister(RemoteJobLister * newLister);
 
     QMap<QString, const RemoteJobData *> getJobsList();
