@@ -37,7 +37,6 @@
 
 #include "agavetaskguide.h"
 #include "agavetaskreply.h"
-#include "agavepipebuffer.h"
 
 #include "filemetadata.h"
 
@@ -74,7 +73,8 @@ void AgaveHandler::finishedOneTask()
 AgaveHandler::~AgaveHandler()
 {
     if ((currentState != RemoteDataInterfaceState::DISCONNECTED) &&
-            (currentState != RemoteDataInterfaceState::INIT))
+            (currentState != RemoteDataInterfaceState::INIT) &&
+            (currentState != RemoteDataInterfaceState::READY))
     {
         qCDebug(remoteInterface, "ERROR: Agave Handler destroyed without proper shutdown");
     }
@@ -86,6 +86,14 @@ AgaveHandler::~AgaveHandler()
 
 QString AgaveHandler::getUserName()
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        QString retVal;
+        QMetaObject::invokeMethod(this, "getUserName", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(QString, retVal));
+        return retVal;
+    }
+
     if ((currentState == RemoteDataInterfaceState::CONNECTED) ||
             (currentState == RemoteDataInterfaceState::DISCONNECTING))
     {
@@ -96,6 +104,16 @@ QString AgaveHandler::getUserName()
 
 RemoteDataReply * AgaveHandler::performAuth(QString uname, QString passwd)
 {   
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "performAuth", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal),
+                                  Q_ARG(QString, uname),
+                                  Q_ARG(QString, passwd));
+        return retVal;
+    }
+
     if (currentState != RemoteDataInterfaceState::READY)
     {
         qCDebug(remoteInterface, "Login attempted in wrong state.");
@@ -123,6 +141,15 @@ RemoteDataReply * AgaveHandler::performAuth(QString uname, QString passwd)
 
 RemoteDataReply * AgaveHandler::remoteLS(QString dirPath)
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "remoteLS", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal),
+                                  Q_ARG(QString, dirPath));
+        return retVal;
+    }
+
     if ((dirPath.isEmpty()) || (dirPath == ""))
     {
         dirPath = "/";
@@ -139,6 +166,15 @@ RemoteDataReply * AgaveHandler::remoteLS(QString dirPath)
 
 RemoteDataReply * AgaveHandler::deleteFile(QString toDelete)
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "deleteFile", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal),
+                                  Q_ARG(QString, toDelete));
+        return retVal;
+    }
+
     if (!remotePathStringIsValid(toDelete)) return createErrorReply("fileDelete", RequestState::INVALID_PARAM);
     if (currentState != RemoteDataInterfaceState::CONNECTED) return createErrorReply("fileDelete", RequestState::INVALID_STATE);
 
@@ -151,6 +187,16 @@ RemoteDataReply * AgaveHandler::deleteFile(QString toDelete)
 
 RemoteDataReply * AgaveHandler::moveFile(QString from, QString to)
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "moveFile", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal),
+                                  Q_ARG(QString, from),
+                                  Q_ARG(QString, to));
+        return retVal;
+    }
+
     if (!remotePathStringIsValid(from)) return createErrorReply("fileMove", RequestState::INVALID_PARAM);
     if (!remotePathStringIsValid(to)) return createErrorReply("fileMove", RequestState::INVALID_PARAM);
     if (currentState != RemoteDataInterfaceState::CONNECTED) return createErrorReply("fileMove", RequestState::INVALID_STATE);
@@ -165,6 +211,16 @@ RemoteDataReply * AgaveHandler::moveFile(QString from, QString to)
 
 RemoteDataReply * AgaveHandler::copyFile(QString from, QString to)
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "copyFile", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal),
+                                  Q_ARG(QString, from),
+                                  Q_ARG(QString, to));
+        return retVal;
+    }
+
     if (!remotePathStringIsValid(from)) return createErrorReply("fileCopy", RequestState::INVALID_PARAM);
     if (!remotePathStringIsValid(to)) return createErrorReply("fileCopy", RequestState::INVALID_PARAM);
     if (currentState != RemoteDataInterfaceState::CONNECTED) return createErrorReply("fileCopy", RequestState::INVALID_STATE);
@@ -179,6 +235,16 @@ RemoteDataReply * AgaveHandler::copyFile(QString from, QString to)
 
 RemoteDataReply * AgaveHandler::renameFile(QString fullName, QString newName)
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "renameFile", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal),
+                                  Q_ARG(QString, fullName),
+                                  Q_ARG(QString, newName));
+        return retVal;
+    }
+
     if (!remotePathStringIsValid(fullName)) return createErrorReply("renameFile", RequestState::INVALID_PARAM);
     if (currentState != RemoteDataInterfaceState::CONNECTED) return createErrorReply("renameFile", RequestState::INVALID_STATE);
     //TODO: check newName is valid
@@ -193,6 +259,16 @@ RemoteDataReply * AgaveHandler::renameFile(QString fullName, QString newName)
 
 RemoteDataReply * AgaveHandler::mkRemoteDir(QString location, QString newName)
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "mkRemoteDir", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal),
+                                  Q_ARG(QString, location),
+                                  Q_ARG(QString, newName));
+        return retVal;
+    }
+
     if (!remotePathStringIsValid(location)) return createErrorReply("newFolder", RequestState::INVALID_PARAM);
     if (currentState != RemoteDataInterfaceState::CONNECTED) return createErrorReply("newFolder", RequestState::INVALID_STATE);
     //TODO: check newName is valid
@@ -207,6 +283,16 @@ RemoteDataReply * AgaveHandler::mkRemoteDir(QString location, QString newName)
 
 RemoteDataReply * AgaveHandler::uploadFile(QString location, QString localFileName)
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "uploadFile", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal),
+                                  Q_ARG(QString, location),
+                                  Q_ARG(QString, localFileName));
+        return retVal;
+    }
+
     if (!remotePathStringIsValid(location)) return createErrorReply("fileUpload", RequestState::INVALID_PARAM);
     if (currentState != RemoteDataInterfaceState::CONNECTED) return createErrorReply("fileUpload", RequestState::INVALID_STATE);
     //TODO: check that local file exists
@@ -221,6 +307,17 @@ RemoteDataReply * AgaveHandler::uploadFile(QString location, QString localFileNa
 
 RemoteDataReply * AgaveHandler::uploadBuffer(QString location, QByteArray fileData, QString newFileName)
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "uploadBuffer", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal),
+                                  Q_ARG(QString, location),
+                                  Q_ARG(QByteArray, fileData),
+                                  Q_ARG(QString, newFileName));
+        return retVal;
+    }
+
     if (!remotePathStringIsValid(location)) return createErrorReply("filePipeUpload", RequestState::INVALID_PARAM);
     if (currentState != RemoteDataInterfaceState::CONNECTED) return createErrorReply("filePipeUpload", RequestState::INVALID_STATE);
     //TODO: check newFileName is valid
@@ -236,6 +333,16 @@ RemoteDataReply * AgaveHandler::uploadBuffer(QString location, QByteArray fileDa
 
 RemoteDataReply * AgaveHandler::downloadFile(QString localDest, QString remoteName)
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "downloadFile", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal),
+                                  Q_ARG(QString, localDest),
+                                  Q_ARG(QString, remoteName));
+        return retVal;
+    }
+
     if (!remotePathStringIsValid(remoteName)) return createErrorReply("fileDownload", RequestState::INVALID_PARAM);
     if (currentState != RemoteDataInterfaceState::CONNECTED) return createErrorReply("fileDownload", RequestState::INVALID_STATE);
     //TODO: check localDest exists
@@ -250,6 +357,15 @@ RemoteDataReply * AgaveHandler::downloadFile(QString localDest, QString remoteNa
 
 RemoteDataReply * AgaveHandler::downloadBuffer(QString remoteName)
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "downloadBuffer", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal),
+                                  Q_ARG(QString, remoteName));
+        return retVal;
+    }
+
     if (!remotePathStringIsValid(remoteName)) return createErrorReply("filePipeDownload", RequestState::INVALID_PARAM);
     if (currentState != RemoteDataInterfaceState::CONNECTED) return createErrorReply("filePipeDownload", RequestState::INVALID_STATE);
 
@@ -262,6 +378,14 @@ RemoteDataReply * AgaveHandler::downloadBuffer(QString remoteName)
 
 AgaveTaskReply * AgaveHandler::getAgaveAppList()
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        AgaveTaskReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "getAgaveAppList", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(AgaveTaskReply *, retVal));
+        return retVal;
+    }
+
     if (currentState != RemoteDataInterfaceState::CONNECTED) return createErrorReply("getAgaveList", RequestState::INVALID_STATE);
 
     return performAgaveQuery("getAgaveList");
@@ -269,6 +393,15 @@ AgaveTaskReply * AgaveHandler::getAgaveAppList()
 
 void AgaveHandler::setAgaveConnectionParams(QString tenant, QString clientId, QString storage)
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        QMetaObject::invokeMethod(this, "setAgaveConnectionParams", Qt::BlockingQueuedConnection,
+                                  Q_ARG(QString, tenant),
+                                  Q_ARG(QString, clientId),
+                                  Q_ARG(QString, storage));
+        return;
+    }
+
     if (currentState != RemoteDataInterfaceState::INIT)
     {
         qCDebug(remoteInterface, "ERROR: Can only set connection parameters once per agave handle instance.");
@@ -286,6 +419,21 @@ void AgaveHandler::setAgaveConnectionParams(QString tenant, QString clientId, QS
 
 RemoteDataReply * AgaveHandler::runRemoteJob(QString jobName, ParamMap jobParameters, QString remoteWorkingDir, QString indivJobName, QString archivePath)
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "runRemoteJob", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal),
+                                  Q_ARG(QString, jobName),
+                                  Q_ARG(ParamMap, jobParameters),
+                                  Q_ARG(QString, remoteWorkingDir),
+                                  Q_ARG(QString, indivJobName),
+                                  Q_ARG(QString, archivePath));
+        return retVal;
+    }
+
+    if (currentState != RemoteDataInterfaceState::CONNECTED) return createErrorReply("agaveAppStart", RequestState::INVALID_STATE);
+
     //This function is only for Agave Jobs
     AgaveTaskGuide * guideToCheck = retriveTaskGuide(jobName);
     if (guideToCheck == nullptr)
@@ -377,6 +525,17 @@ RemoteDataReply * AgaveHandler::runRemoteJob(QString jobName, ParamMap jobParame
 
 RemoteDataReply * AgaveHandler::runAgaveJob(QJsonDocument rawJobJSON)
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        AgaveTaskReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "runAgaveJob", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(AgaveTaskReply *, retVal),
+                                  Q_ARG(QJsonDocument, rawJobJSON));
+        return retVal;
+    }
+
+    if (currentState != RemoteDataInterfaceState::CONNECTED) return createErrorReply("agaveAppStart", RequestState::INVALID_STATE);
+
     QMap<QString, QByteArray> taskVars;
 
     taskVars.insert("rawJobJSON", rawJobJSON.toJson());
@@ -390,11 +549,28 @@ RemoteDataReply * AgaveHandler::runAgaveJob(QJsonDocument rawJobJSON)
 
 RemoteDataReply * AgaveHandler::getListOfJobs()
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "getListOfJobs", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal));
+        return retVal;
+    }
+
     return qobject_cast<RemoteDataReply *>(performAgaveQuery("getJobList"));
 }
 
 RemoteDataReply * AgaveHandler::getJobDetails(QString IDstr)
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "getJobDetails", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal),
+                                  Q_ARG(QString, IDstr));
+        return retVal;
+    }
+
     QMap<QString, QByteArray> taskVars;
     taskVars.insert("IDstr", IDstr.toLatin1());
 
@@ -404,6 +580,15 @@ RemoteDataReply * AgaveHandler::getJobDetails(QString IDstr)
 
 RemoteDataReply * AgaveHandler::stopJob(QString IDstr)
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "stopJob", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal),
+                                  Q_ARG(QString, IDstr));
+        return retVal;
+    }
+
     QMap<QString, QByteArray> taskVars;
     taskVars.insert("IDstr", IDstr.toLatin1());
 
@@ -413,11 +598,30 @@ RemoteDataReply * AgaveHandler::stopJob(QString IDstr)
 
 RemoteDataInterfaceState AgaveHandler::getInterfaceState()
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataInterfaceState retVal;
+        QMetaObject::invokeMethod(this, "getInterfaceState", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataInterfaceState, retVal));
+        return retVal;
+    }
+
     return currentState;
 }
 
 void AgaveHandler::registerAgaveAppInfo(QString agaveAppName, QString fullAgaveName, QStringList parameterList, QStringList inputList, QString workingDirParameter)
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        QMetaObject::invokeMethod(this, "registerAgaveAppInfo", Qt::BlockingQueuedConnection,
+                                  Q_ARG(QString, agaveAppName),
+                                  Q_ARG(QString, fullAgaveName),
+                                  Q_ARG(QStringList, parameterList),
+                                  Q_ARG(QStringList, inputList),
+                                  Q_ARG(QString, workingDirParameter));
+        return;
+    }
+
     qCDebug(remoteInterface, "Registering Agave ID: %s", qPrintable(fullAgaveName));
     AgaveTaskGuide * toInsert = new AgaveTaskGuide(agaveAppName, AgaveRequestType::AGAVE_APP);
     toInsert->setAgaveFullName(fullAgaveName);
@@ -429,6 +633,14 @@ void AgaveHandler::registerAgaveAppInfo(QString agaveAppName, QString fullAgaveN
 
 RemoteDataReply * AgaveHandler::closeAllConnections()
 {
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "closeAllConnections", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal));
+        return retVal;
+    }
+
     if (currentState != RemoteDataInterfaceState::CONNECTED)
     {
         qCDebug(remoteInterface, "ERROR: Logout attempted when not logged in.");
@@ -445,7 +657,7 @@ RemoteDataReply * AgaveHandler::closeAllConnections()
     qCDebug(remoteInterface, "Closing agave connection.");
     changeAuthState(RemoteDataInterfaceState::DISCONNECTING);
     AgaveTaskReply * waitHandle = new AgaveTaskReply(retriveTaskGuide("waitAll"),nullptr,this,qobject_cast<QObject *>(this));
-    QObject::connect(this, SIGNAL(finishedAllTasks()), waitHandle, SLOT(rawNoDataNoHttpTaskComplete()));
+    QObject::connect(this, SIGNAL(finishedAllTasks()), waitHandle, SLOT(rawNoDataNoHttpTaskComplete()), Qt::QueuedConnection);
     //maybe TODO: Remove client entry?
 
     QMap<QString, QByteArray> taskVars;
@@ -994,11 +1206,12 @@ QNetworkReply * AgaveHandler::distillRequestData(AgaveTaskGuide * taskGuide, QMa
     }
     else if (taskGuide->getRequestType() == AgaveRequestType::AGAVE_PIPE_UPLOAD)
     {
-        QByteArray pipedFileData = varList->value("fileData");
         qCDebug(remoteInterface, "New File Name: %s\n", qPrintable(varList->value("newFileName")));
 
-        AgavePipeBuffer * pipedData = new AgavePipeBuffer(&pipedFileData);
-        pipedData->open(QBuffer::ReadOnly);
+        QBuffer * pipedData = new QBuffer();
+        pipedData->open(QBuffer::ReadWrite);
+        pipedData->write(varList->value("fileData"));
+
         qCDebug(remoteInterface, "URL Req: %s", qPrintable(taskGuide->getArgAndURLsuffix(varList)));
 
         return finalizeAgaveRequest(taskGuide, taskGuide->getArgAndURLsuffix(varList),
@@ -1056,6 +1269,7 @@ QNetworkReply * AgaveHandler::finalizeAgaveRequest(AgaveTaskGuide * theGuide, QS
         if (authHeader->isEmpty())
         {
             qCDebug(remoteInterface, "ERROR: Authorization request reply has no data in it");
+            if (fileHandle != nullptr) fileHandle->deleteLater();
             return nullptr;
         }
         clientRequest->setRawHeader(QByteArray("Authorization"), *authHeader);
@@ -1104,7 +1318,7 @@ QNetworkReply * AgaveHandler::finalizeAgaveRequest(AgaveTaskGuide * theGuide, QS
         fileUpload->setParent(clientReply);
     }
 
-    QObject::connect(clientReply, SIGNAL(finished()), this, SLOT(finishedOneTask()));
+    QObject::connect(clientReply, SIGNAL(finished()), this, SLOT(finishedOneTask()), Qt::QueuedConnection);
 
     return clientReply;
 }

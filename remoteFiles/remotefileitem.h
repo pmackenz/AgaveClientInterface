@@ -33,17 +33,31 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef AGAVEPIPEBUFFER_H
-#define AGAVEPIPEBUFFER_H
+#ifndef REMOTEFILEITEM_H
+#define REMOTEFILEITEM_H
 
-#include <QBuffer>
+#include <QStandardItem>
 
-class AgavePipeBuffer : public QBuffer
+#include "filenoderef.h"
+
+class RemoteFileItem : public QStandardItem
 {
 public:
-    AgavePipeBuffer(QByteArray * oldBuffer, QObject * parent = nullptr);
+    RemoteFileItem(bool isLoading);
+    RemoteFileItem(FileNodeRef fileInfo);
+    RemoteFileItem(RemoteFileItem * rowLeader);
+
+    RemoteFileItem * getRowHeader();
+    QList<RemoteFileItem*> getRowList();
+    FileNodeRef getFile();
+    bool parentOfPlaceholder();
+
 private:
-    QByteArray myByteArray;
+    void appendToRowList(RemoteFileItem * toAdd);
+
+    RemoteFileItem * myRowLeader = nullptr;
+    QList<RemoteFileItem*> rowList;
+    FileNodeRef myFile;
 };
 
-#endif // AGAVEPIPEBUFFER_H
+#endif // REMOTEFILEITEM_H

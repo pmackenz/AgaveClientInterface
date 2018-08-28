@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2018 The University of Notre Dame
-** Copyright (c) 2018 The Regents of the University of California
+** Copyright (c) 2017 The University of Notre Dame
+** Copyright (c) 2017 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -33,13 +33,44 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "agavepipebuffer.h"
+#ifndef REMOTEJOBENTRY_H
+#define REMOTEJOBENTRY_H
 
-AgavePipeBuffer::AgavePipeBuffer(QByteArray *oldBuffer, QObject *parent) :
-    QBuffer(parent)
+#include <QObject>
+#include <QStandardItem>
+
+class LinkedStandardItem;
+class RemoteDataReply;
+class JobOperator;
+enum class RequestState;
+
+#include "remotejobdata.h"
+
+class JobListNode : public QObject
 {
-    myByteArray.clear();
-    myByteArray.append(*oldBuffer);
+    Q_OBJECT
+public:
+    explicit JobListNode(RemoteJobData newData, QStandardItemModel * theModel, JobOperator *parent);
+    ~JobListNode();
 
-    QBuffer::setBuffer(&myByteArray);
-}
+    void setData(RemoteJobData newData);
+    const RemoteJobData * getData();
+    bool haveDetails();
+    void setDetails(QMap<QString, QString> inputs, QMap<QString, QString> params);
+
+    bool haveDetailTask();
+    void setDetailTask(RemoteDataReply * newTask);
+
+private slots:
+    void deliverJobDetails(RequestState taskState, RemoteJobData fullJobData);
+
+private:
+    JobOperator * myOperator;
+    QStandardItemModel * myModel = nullptr;
+    LinkedStandardItem * myModelItem = nullptr;
+    RemoteJobData myData;
+
+    RemoteDataReply * myDetailTask = nullptr;
+};
+
+#endif // REMOTEJOBENTRY_H

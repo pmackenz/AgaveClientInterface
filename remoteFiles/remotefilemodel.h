@@ -33,30 +33,58 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef AGAVETHREAD_H
-#define AGAVETHREAD_H
+#ifndef REMOTEFILEMODEL_H
+#define REMOTEFILEMODEL_H
 
-#include "../remotedatainterface.h"
+#include <QObject>
+#include <QStandardItemModel>
+#include <QStandardItem>
+#include <QHeaderView>
 
-#include <QNetworkAccessManager>
+#include "filenoderef.h"
 
-class AgaveTaskReply;
+class FileNodeRef;
+class FileOperator;
+class RemoteFileItem;
+class RemoteFileTree;
 
-class AgaveThread : public RemoteDataThread
+class RemoteFileModel : public QObject
 {
     Q_OBJECT
+
+    friend class RemoteFileTree;
+
 public:
-    AgaveThread(QObject * parent = nullptr);
-
-    void registerAgaveAppInfo(QString agaveAppName, QString fullAgaveName, QStringList parameterList, QStringList inputList, QString workingDirParameter);
-    void setAgaveConnectionParams(QString tenant, QString clientId, QString storage);
-
-    AgaveTaskReply * getAgaveAppList();
-
-    AgaveTaskReply * runAgaveJob(QJsonDocument rawJobJSON);
+    RemoteFileModel(QObject *parent = nullptr);
 
 protected:
-    virtual void run();
+    RemoteFileItem * getItemByFile(FileNodeRef toFind);
+    QStandardItemModel * getRawModel();
+
+private slots:
+    void newFileData(FileNodeRef newFileData);
+
+private:
+    void setRootItem(FileNodeRef rootFile);
+    void purgeItem(FileNodeRef toRemove);
+    void updateItem(FileNodeRef toUpdate, bool folderContentsLoaded = false);
+    QList<RemoteFileItem *> createItemList(FileNodeRef theFileNode);
+
+    RemoteFileItem * findTargetItem(RemoteFileItem * parentItem, FileNodeRef toFind);
+    RemoteFileItem * findParentItem(FileNodeRef toFind);
+    QString getRawColumnData(FileNodeRef fileData, int i);
+    static QList<QStandardItem *> demoteList(QList<RemoteFileItem *> inputList);
+    static QStringList separateFilePathParts(QString thePath);
+    void updateItemList(QList<RemoteFileItem *> theList, FileNodeRef newFileInfo);
+
+    QStandardItemModel theModel;
+    RemoteFileItem * userRoot = nullptr;
+
+    //const int tableNumCols = 7;
+    //const QStringList shownHeaderLabelList = {"File Name","Type","Size","Last Changed",
+    //                               "Format","mimeType","Permissions"};
+    const int tableNumCols = 3;
+    const QStringList shownHeaderLabelList = {"File Name","Type","Size"};
 };
 
-#endif // AGAVETHREAD_H
+#endif // REMOTEFILEMODEL_H
