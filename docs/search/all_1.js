@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['remotedatainterface',['RemoteDataInterface',['../classRemoteDataInterface.html',1,'']]],
-  ['remotedatareply',['RemoteDataReply',['../classRemoteDataReply.html',1,'']]],
-  ['remotejobdata',['RemoteJobData',['../classRemoteJobData.html',1,'']]]
+  ['filenoderef',['FileNodeRef',['../classFileNodeRef.html',1,'']]],
+  ['fileoperator',['FileOperator',['../classFileOperator.html',1,'']]],
+  ['filetreenode',['FileTreeNode',['../classFileTreeNode.html',1,'']]]
 ];
