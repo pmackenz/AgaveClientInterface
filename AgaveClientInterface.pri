@@ -38,3 +38,6 @@ HEADERS += \
     $$PWD/remoteJobs/linkedstandarditem.h \
     $$PWD/remoteJobs/remotejoblister.h
 
+DISTFILES += \
+    $$PWD/doxygen.cfg
+
