@@ -1,5 +1,7 @@
-Readme for the Agave to QT Client Interface
+Agave to QT Client Interface
 
-This library is intended to be included in QT projects which seek to access Agave resources.
+This library is intended to be included in QT projects which seek to communicate with an Agave server.
 
-This folder should be placed in the same folder next to the project which uses it.
+The AgaveClientInterface.pri file can be imported by a project which uses this repo.
+
+An (as-yet-incomplete) documentation of the code can be found at: https://nheri-simcenter.github.io/AgaveClientInterface/
