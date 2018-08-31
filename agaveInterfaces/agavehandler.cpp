@@ -1211,6 +1211,7 @@ QNetworkReply * AgaveHandler::distillRequestData(AgaveTaskGuide * taskGuide, QMa
         QBuffer * pipedData = new QBuffer();
         pipedData->open(QBuffer::ReadWrite);
         pipedData->write(varList->value("fileData"));
+        pipedData->seek(0);
 
         qCDebug(remoteInterface, "URL Req: %s", qPrintable(taskGuide->getArgAndURLsuffix(varList)));
 
