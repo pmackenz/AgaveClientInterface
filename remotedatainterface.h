@@ -51,7 +51,7 @@ Q_DECLARE_METATYPE(ParamMap)
 Q_DECLARE_LOGGING_CATEGORY(remoteInterface)
 Q_DECLARE_LOGGING_CATEGORY(rawHTTP)
 
-enum class RemoteDataInterfaceState {INIT, READY, AUTH_TRY, CONNECTED, DISCONNECTING, DISCONNECTED};
+enum class RemoteDataInterfaceState {INIT, READY_TO_AUTH, AUTH_TRY, CANCEL_AUTH, CONNECTED, DISCONNECTING, DISCONNECTED};
 
 enum class RequestState {GOOD, PENDING,
                          UNKNOWN_TASK, INTERNAL_ERROR, INVALID_STATE,
@@ -73,11 +73,11 @@ class RemoteDataReply : public QObject
 
 public:
     RemoteDataReply(QObject * parent);
+    virtual void setAsUnconnectedReply() = 0;
 
 signals:
     //All referenced values should be copied by the reciever or they will be discarded
-    void haveCurrentRemoteDir(RequestState replyState, QString pwd);
-    void connectionsClosed(RequestState replyState);
+    void startedLogout(RequestState replyState);
 
     void haveAuthReply(RequestState authReply);
     void haveLSReply(RequestState replyState, QList<FileMetaData> fileDataList);
@@ -145,6 +145,9 @@ public slots:
 
     static QString interpretRequestState(RequestState theState);
     static QString removeDoubleSlashes(QString stringIn);
+
+signals:
+    void connectionStateChanged(RemoteDataInterfaceState newState);
 };
 
 #endif // REMOTEDATAINTERFACE_H

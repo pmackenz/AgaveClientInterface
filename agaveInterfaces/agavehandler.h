@@ -107,9 +107,6 @@ public slots:
 
     RemoteDataReply * runAgaveJob(QJsonDocument rawJobJSON);
 
-signals:
-    void finishedAllTasks();
-
 protected:
     void handleInternalTask(AgaveTaskReply *agaveReply, QNetworkReply * rawReply);
     void handleInternalTask(AgaveTaskReply *agaveReply, RequestState taskState);
@@ -120,8 +117,8 @@ private slots:
 private:
     AgaveTaskReply * performAgaveQuery(QString queryName);
     AgaveTaskReply * performAgaveQuery(QString queryName, QMap<QString, QByteArray> varList, AgaveTaskReply *parentReq = nullptr);
-    AgaveTaskReply * createErrorReply(AgaveTaskGuide * theTaskType, RequestState errorState, AgaveTaskReply *parentReq = nullptr);
-    AgaveTaskReply * createErrorReply(QString theTaskType, RequestState errorState, AgaveTaskReply *parentReq = nullptr);
+    AgaveTaskReply * createDirectReply(AgaveTaskGuide * theTaskType, RequestState errorState, AgaveTaskReply *parentReq = nullptr);
+    AgaveTaskReply * createDirectReply(QString theTaskType, RequestState errorState, AgaveTaskReply *parentReq = nullptr);
 
     QNetworkReply * distillRequestData(AgaveTaskGuide * theGuide, QMap<QString, QByteArray> * varList);
     QNetworkReply * finalizeAgaveRequest(AgaveTaskGuide * theGuide, QString urlAppend, QByteArray * authHeader = nullptr, QByteArray postData = "", QIODevice * fileHandle = nullptr);

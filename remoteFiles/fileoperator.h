@@ -58,6 +58,7 @@ enum class RequestState;
 enum class NodeState;
 enum class FileOperatorState {IDLE, REC_UPLOAD, REC_DOWNLOAD, REC_UPLOAD_ACTIVE, ACTIVE};
 enum class RecursiveErrorCodes {NONE, MKDIR_FAIL, UPLOAD_FAIL, TYPE_MISSMATCH, LOST_FILE};
+enum class RemoteDataInterfaceState;
 
 class FileOperator : public QObject
 {
@@ -67,11 +68,8 @@ class FileOperator : public QObject
     friend class FileNodeRef;
 
 public:
-    FileOperator(QObject *parent);
+    FileOperator(RemoteDataInterface * theInterface, QObject *parent);
     ~FileOperator();
-
-    void resetFileData(RemoteDataInterface *parent, QString rootFolder);
-    void resetFileData();
 
     const FileNodeRef speculateFileWithName(QString fullPath, bool folder);
     const FileNodeRef speculateFileWithName(const FileNodeRef &baseNode, QString addedPath, bool folder);
@@ -129,6 +127,8 @@ protected:
     void enactFolderRefresh(const FileNodeRef &selectedNode, bool clearData = false);
 
 private slots:
+    void interfaceHasNewState(RemoteDataInterfaceState newState);
+
     void getDeleteReply(RequestState replyState, QString toDelete);
     void getMoveReply(RequestState replyState, FileMetaData revisedFileData, QString from);
     void getCopyReply(RequestState replyState, FileMetaData newFileData);

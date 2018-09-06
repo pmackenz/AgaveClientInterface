@@ -44,32 +44,20 @@
 
 Q_LOGGING_CATEGORY(fileManager, "File Manager")
 
-FileOperator::FileOperator(QObject *parent) : QObject(parent)
+FileOperator::FileOperator(RemoteDataInterface * theInterface, QObject *parent) : QObject(parent)
 {
+    myInterface = theInterface;
+    if (myInterface == nullptr)
+    {
+        qFatal("Cannot create JobOperator object with null remote interface.");
+    }
     //Note: will be deconstructed with parent
+    QObject::connect(myInterface, SIGNAL(connectionStateChanged(RemoteDataInterfaceState)), this, SLOT(interfaceHasNewState(RemoteDataInterfaceState)));
 }
 
 FileOperator::~FileOperator()
 {
     delete rootFileNode;
-}
-
-void FileOperator::resetFileData(RemoteDataInterface *parent, QString rootFolder)
-{
-    myInterface = parent;
-    myRootFolderName = rootFolder;
-    resetFileData();
-}
-
-void FileOperator::resetFileData()
-{
-    if (rootFileNode != nullptr)
-    {
-        rootFileNode->deleteLater();
-    }
-    rootFileNode = new FileTreeNode(myRootFolderName, this);
-
-    enactRootRefresh();
 }
 
 FileTreeNode * FileOperator::getFileNodeFromNodeRef(const FileNodeRef &thedata, bool verifyTimestamp)
@@ -118,6 +106,16 @@ void FileOperator::enactFolderRefresh(const FileNodeRef &selectedNode, bool clea
 bool FileOperator::operationIsPending()
 {
     return (myState != FileOperatorState::IDLE);
+}
+
+void FileOperator::interfaceHasNewState(RemoteDataInterfaceState newState)
+{
+    if (newState != RemoteDataInterfaceState::CONNECTED) return;
+
+    myRootFolderName =  myInterface->getUserName();
+    rootFileNode = new FileTreeNode(myRootFolderName, this);
+
+    enactRootRefresh();
 }
 
 void FileOperator::sendDeleteReq(const FileNodeRef &selectedNode)
