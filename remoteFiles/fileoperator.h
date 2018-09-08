@@ -52,6 +52,7 @@ Q_DECLARE_LOGGING_CATEGORY(fileManager)
 class FileTreeNode;
 class RemoteFileTree;
 class FileMetaData;
+class RemoteFileModel;
 class RemoteDataInterface;
 
 enum class RequestState;
@@ -70,6 +71,8 @@ class FileOperator : public QObject
 public:
     FileOperator(RemoteDataInterface * theInterface, QObject *parent);
     ~FileOperator();
+
+    void connectFileTreeWidget(RemoteFileTree * connectedWidget);
 
     const FileNodeRef speculateFileWithName(QString fullPath, bool folder);
     const FileNodeRef speculateFileWithName(const FileNodeRef &baseNode, QString addedPath, bool folder);
@@ -171,6 +174,7 @@ private:
 
     QDir recursiveLocalHead;
     FileTreeNode * recursiveRemoteHead;
+    RemoteFileModel * myModel;
 };
 
 #endif // FILEOPERATOR_H

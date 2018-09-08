@@ -37,6 +37,7 @@
 
 #include "remotefileitem.h"
 #include "remotefilemodel.h"
+#include "fileoperator.h"
 #include "filenoderef.h"
 
 RemoteFileTree::RemoteFileTree(QWidget *parent) :
@@ -76,10 +77,9 @@ void RemoteFileTree::selectRowByFile(FileNodeRef toSelect)
     selectRowByItem(nodeToFind);
 }
 
-void RemoteFileTree::setModelLink(RemoteFileModel * theModel)
+void RemoteFileTree::setModelLink(FileOperator * theOperator)
 {
-    myModel = theModel;
-    setModel(theModel->getRawModel());
+    theOperator->connectFileTreeWidget(this);
     header()->resizeSection(0,350);
     header()->resizeSection(1,40);
 }

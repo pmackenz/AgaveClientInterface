@@ -38,6 +38,7 @@
 #include "remotefiletree.h"
 #include "filetreenode.h"
 #include "filenoderef.h"
+#include "remotefilemodel.h"
 
 #include "filemetadata.h"
 #include "remotedatainterface.h"
@@ -51,13 +52,20 @@ FileOperator::FileOperator(RemoteDataInterface * theInterface, QObject *parent) 
     {
         qFatal("Cannot create JobOperator object with null remote interface.");
     }
-    //Note: will be deconstructed with parent
+    myModel = new RemoteFileModel(this);
+    QObject::connect(this, SIGNAL(fileSystemChange(FileNodeRef)), myModel, SLOT(newFileData(FileNodeRef)), Qt::QueuedConnection);
+
     QObject::connect(myInterface, SIGNAL(connectionStateChanged(RemoteDataInterfaceState)), this, SLOT(interfaceHasNewState(RemoteDataInterfaceState)));
 }
 
 FileOperator::~FileOperator()
 {
     delete rootFileNode;
+}
+
+void FileOperator::connectFileTreeWidget(RemoteFileTree * connectedWidget)
+{
+    connectedWidget->setModel(myModel->getRawModel());
 }
 
 FileTreeNode * FileOperator::getFileNodeFromNodeRef(const FileNodeRef &thedata, bool verifyTimestamp)

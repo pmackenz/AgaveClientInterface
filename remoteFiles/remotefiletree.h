@@ -64,7 +64,7 @@ public:
 
     FileNodeRef getSelectedFile();
     void selectRowByFile(FileNodeRef toSelect);
-    void setModelLink(RemoteFileModel * theModel);
+    void setModelLink(FileOperator *theModel);
 
 signals:
     void newFileSelected(FileNodeRef newFileData);

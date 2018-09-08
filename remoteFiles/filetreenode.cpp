@@ -78,7 +78,6 @@ FileTreeNode::~FileTreeNode()
 {
     //Note: DO NOT call delete directly on a file tree node except when
     //shutting down or resetting the file tree
-    //Use markForDelete to insure signaling of changes to the file tree
     while (this->childList.size() > 0)
     {
         FileTreeNode * toDelete = this->childList.takeLast();
