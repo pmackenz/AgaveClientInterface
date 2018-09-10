@@ -54,6 +54,7 @@ class RemoteFileTree;
 class FileMetaData;
 class RemoteFileModel;
 class RemoteDataInterface;
+class RemoteFileItem;
 
 enum class RequestState;
 enum class NodeState;
@@ -107,6 +108,8 @@ public:
 
     void quickInfoPopup(QString infoText);
     bool deletePopup(const FileNodeRef &toDelete);
+
+    RemoteFileItem * getItemByFile(FileNodeRef toFind);
 
 signals:
     //Note: it is very important that connections for these signals be queued

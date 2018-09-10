@@ -79,7 +79,7 @@ private slots:
 private:
     void selectRowByItem(QStandardItem *linkedItem);
 
-    RemoteFileModel * myModel = nullptr;
+    FileOperator * myOperator = nullptr;
 };
 
 #endif // REMOTEFILEWINDOW_H

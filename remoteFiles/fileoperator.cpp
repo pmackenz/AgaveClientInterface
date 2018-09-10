@@ -838,6 +838,11 @@ bool FileOperator::deletePopup(const FileNodeRef &toDelete)
     return false;
 }
 
+RemoteFileItem * FileOperator::getItemByFile(FileNodeRef toFind)
+{
+    return myModel->getItemByFile(toFind);
+}
+
 void FileOperator::recursiveDownloadProcessRetry()
 {
     if (myState != FileOperatorState::REC_DOWNLOAD) return;

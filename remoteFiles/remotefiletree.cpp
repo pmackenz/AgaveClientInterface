@@ -65,9 +65,10 @@ FileNodeRef RemoteFileTree::getSelectedFile()
 
 void RemoteFileTree::selectRowByFile(FileNodeRef toSelect)
 {
+    if (myOperator == nullptr) return;
     if (toSelect.getFullPath() == getSelectedFile().getFullPath()) return;
 
-    RemoteFileItem * nodeToFind = myModel->getItemByFile(toSelect);
+    RemoteFileItem * nodeToFind = myOperator->getItemByFile(toSelect);
     if (nodeToFind == nullptr)
     {
         clearSelection();
@@ -79,7 +80,8 @@ void RemoteFileTree::selectRowByFile(FileNodeRef toSelect)
 
 void RemoteFileTree::setModelLink(FileOperator * theOperator)
 {
-    theOperator->connectFileTreeWidget(this);
+    myOperator = theOperator;
+    myOperator->connectFileTreeWidget(this);
     header()->resizeSection(0,350);
     header()->resizeSection(1,40);
 }
