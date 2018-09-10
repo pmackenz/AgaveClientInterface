@@ -42,10 +42,15 @@
 
 Q_LOGGING_CATEGORY(jobManager, "Job Manager")
 
-JobOperator::JobOperator(QObject *parent) : QObject(qobject_cast<QObject *>(parent))
+JobOperator::JobOperator(RemoteDataInterface * theDataInterface, QObject *parent) : QObject(qobject_cast<QObject *>(parent))
 {
-    myInterface = nullptr;
+    myInterface = theDataInterface;
+    if (myInterface == nullptr)
+    {
+        qFatal("Cannot create JobOperator object with null remote interface.");
+    }
     theJobList.setHorizontalHeaderLabels({"Task Name", "State", "Agave App", "Time Created", "Agave ID"});
+    QObject::connect(myInterface, SIGNAL(connectionStateChanged(RemoteDataInterfaceState)), this, SLOT(interfaceHasNewState(RemoteDataInterfaceState)));
 }
 
 JobOperator::~JobOperator()
@@ -54,13 +59,6 @@ JobOperator::~JobOperator()
     {
         delete (*itr);
     }
-}
-
-void JobOperator::resetJobData(RemoteDataInterface * theDataInterface)
-{
-    myInterface = theDataInterface;
-    demandJobDataRefresh();
-    //TODO: Other reset stuff
 }
 
 void JobOperator::linkToJobLister(RemoteJobLister * newLister)
@@ -190,4 +188,11 @@ void JobOperator::demandJobDataRefresh()
     currentJobReply = myInterface->getListOfJobs();
     QObject::connect(currentJobReply, SIGNAL(haveJobList(RequestState,QList<RemoteJobData>)),
                      this, SLOT(refreshRunningJobList(RequestState,QList<RemoteJobData>)));
+}
+
+void JobOperator::interfaceHasNewState(RemoteDataInterfaceState newState)
+{
+    if (newState != RemoteDataInterfaceState::CONNECTED) return;
+
+    demandJobDataRefresh();
 }

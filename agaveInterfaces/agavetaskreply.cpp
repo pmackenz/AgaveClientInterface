@@ -108,6 +108,11 @@ QMap<QString, QByteArray> * AgaveTaskReply::getTaskParamList()
     return &taskParamList;
 }
 
+void AgaveTaskReply::setAsUnconnectedReply()
+{
+    expectsSignalConnect = false;
+}
+
 void AgaveTaskReply::setDelayedDatalessReply(RequestState replyState)
 {
     pendingReply = replyState;
@@ -129,11 +134,7 @@ void AgaveTaskReply::processDatalessReply(RequestState replyState)
         qCDebug(remoteInterface, "Agave Task Fail: %s", qPrintable(RemoteDataInterface::interpretRequestState(replyState)));
     }
 
-    if (myGuide->getTaskID() == "changeDir")
-    {
-        emit haveCurrentRemoteDir(replyState, QString());
-    }
-    else if (myGuide->getTaskID() == "fullAuth")
+    if (myGuide->getTaskID() == "fullAuth")
     {
         emit haveAuthReply(replyState);
     }
@@ -147,9 +148,9 @@ void AgaveTaskReply::processDatalessReply(RequestState replyState)
     {
         emit haveLSReply(replyState, QList<FileMetaData>());
     }
-    else if (myGuide->getTaskID() == "waitAll")
+    else if (myGuide->getTaskID() == "startedLogout")
     {
-        emit connectionsClosed(replyState);
+        emit startedLogout(replyState);
     }
     else if ((myGuide->getTaskID() == "fileUpload") || (myGuide->getTaskID() == "filePipeUpload"))
     {
@@ -210,20 +211,14 @@ void AgaveTaskReply::rawNoDataNoHttpTaskComplete(RequestState replyState)
 {
     this->deleteLater();
 
-    //If this task is an INTERNAL task, then the result is redirected to the manager
-    if (myGuide->isInternal())
-    {
-        myManager->handleInternalTask(this, replyState);
-        return;
-    }
-
     if (myGuide->getRequestType() != AgaveRequestType::AGAVE_NONE)
     {
         qCDebug(remoteInterface, "ERROR: no-http no-data reply signaled for wrong task type");
         processDatalessReply(RequestState::INTERNAL_ERROR);
     }
-    signalConnectDelay();
-    processDatalessReply(replyState);
+
+    pendingReply = replyState;
+    rawPassThruTaskComplete();
 }
 
 void AgaveTaskReply::rawPassThruTaskComplete()
@@ -715,6 +710,8 @@ QMap<QString, QString> AgaveTaskReply::convertVarMapToString(QMap<QString, QVari
 
 void AgaveTaskReply::signalConnectDelay()
 {
+    if (!expectsSignalConnect) return;
+
     //This method is a stopgap against a reply object finishing before
     //being connected to anything. This should never happen.
     int failTrys = 0;
@@ -732,8 +729,7 @@ void AgaveTaskReply::signalConnectDelay()
 
 bool AgaveTaskReply::anySignalConnect()
 {
-    if (isSignalConnected(QMetaMethod::fromSignal(&AgaveTaskReply::haveCurrentRemoteDir))) return true;
-    if (isSignalConnected(QMetaMethod::fromSignal(&AgaveTaskReply::connectionsClosed))) return true;
+    if (isSignalConnected(QMetaMethod::fromSignal(&AgaveTaskReply::startedLogout))) return true;
 
     if (isSignalConnected(QMetaMethod::fromSignal(&AgaveTaskReply::haveAuthReply))) return true;
     if (isSignalConnected(QMetaMethod::fromSignal(&AgaveTaskReply::haveLSReply))) return true;
