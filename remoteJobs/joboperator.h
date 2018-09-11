@@ -50,6 +50,7 @@ class RemoteJobLister;
 class JobListNode;
 class RemoteDataReply;
 
+enum class RemoteDataInterfaceState;
 enum class RequestState;
 
 Q_DECLARE_LOGGING_CATEGORY(jobManager)
@@ -58,10 +59,9 @@ class JobOperator : public QObject
 {
     Q_OBJECT
 public:
-    explicit JobOperator(QObject * parent);
+    explicit JobOperator(RemoteDataInterface * theDataInterface, QObject * parent);
     ~JobOperator();
 
-    void resetJobData(RemoteDataInterface * theDataInterface);
     void linkToJobLister(RemoteJobLister * newLister);
 
     QMap<QString, const RemoteJobData *> getJobsList();
@@ -76,6 +76,7 @@ signals:
 
 public slots:
     void demandJobDataRefresh();
+    void interfaceHasNewState(RemoteDataInterfaceState newState);
 
 private slots:
     void refreshRunningJobList(RequestState replyState, QList<RemoteJobData> theData);
