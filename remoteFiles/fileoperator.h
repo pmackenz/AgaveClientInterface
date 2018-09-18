@@ -106,7 +106,6 @@ public:
     void sendCompressReq(const FileNodeRef &selectedFolder);
     void sendDecompressReq(const FileNodeRef &selectedFolder);
 
-    void quickInfoPopup(QString infoText);
     bool deletePopup(const FileNodeRef &toDelete);
 
     RemoteFileItem * getItemByFile(FileNodeRef toFind);

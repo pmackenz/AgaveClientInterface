@@ -604,6 +604,26 @@ RemoteDataReply * AgaveHandler::stopJob(QString IDstr)
     return qobject_cast<RemoteDataReply *>(theReply);
 }
 
+RemoteDataReply * AgaveHandler::deleteJob(QString IDstr)
+{
+    if (QThread::currentThread() != this->thread())
+    {
+        RemoteDataReply * retVal = nullptr;
+        QMetaObject::invokeMethod(this, "deleteJob", Qt::BlockingQueuedConnection,
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal),
+                                  Q_ARG(QString, IDstr));
+        return retVal;
+    }
+
+    if (currentState != RemoteDataInterfaceState::CONNECTED) return createDirectReply("deleteJob", RequestState::INVALID_STATE);
+
+    QMap<QString, QByteArray> taskVars;
+    taskVars.insert("IDstr", IDstr.toLatin1());
+
+    AgaveTaskReply * theReply = performAgaveQuery("deleteJob", taskVars);
+    return qobject_cast<RemoteDataReply *>(theReply);
+}
+
 RemoteDataInterfaceState AgaveHandler::getInterfaceState()
 {
     if (QThread::currentThread() != this->thread())
@@ -859,6 +879,12 @@ void AgaveHandler::setupTaskGuideList()
     toInsert->setURLsuffix(QString("/jobs/v2/"));
     toInsert->setDynamicURLParams("%1",{"IDstr"});
     toInsert->setPostParams("action=stop");
+    toInsert->setHeaderType(AuthHeaderType::TOKEN);
+    insertAgaveTaskGuide(toInsert);
+
+    toInsert = new AgaveTaskGuide("deleteJob", AgaveRequestType::AGAVE_DELETE);
+    toInsert->setURLsuffix(QString("/jobs/v2/"));
+    toInsert->setDynamicURLParams("%1",{"IDstr"});
     toInsert->setHeaderType(AuthHeaderType::TOKEN);
     insertAgaveTaskGuide(toInsert);
 }

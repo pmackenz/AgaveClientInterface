@@ -38,7 +38,7 @@
 #include "fileoperator.h"
 #include "filenoderef.h"
 
-#include "remoteJobs/linkedstandarditem.h"
+#include "remoteJobs/jobstandarditem.h"
 
 #include "filemetadata.h"
 #include "remotedatainterface.h"
