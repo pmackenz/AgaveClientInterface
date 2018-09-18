@@ -90,6 +90,7 @@ public slots:
     virtual RemoteDataReply * getListOfJobs();
     virtual RemoteDataReply * getJobDetails(QString IDstr);
     virtual RemoteDataReply * stopJob(QString IDstr);
+    virtual RemoteDataReply * deleteJob(QString IDstr);
 
     virtual RemoteDataInterfaceState getInterfaceState();
 
