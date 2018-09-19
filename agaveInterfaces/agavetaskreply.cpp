@@ -190,11 +190,15 @@ void AgaveTaskReply::processDatalessReply(RequestState replyState)
     }
     else if (myGuide->getTaskID() == "getJobDetails")
     {
-        emit haveJobDetails(replyState, RemoteJobData());
+        emit haveJobDetails(replyState, RemoteJobData::nil());
     }
     else if (myGuide->getTaskID() == "stopJob")
     {
         emit haveStoppedJob(replyState);
+    }
+    else if (myGuide->getTaskID() == "deleteJob")
+    {
+        emit haveDeletedJob(replyState);
     }
     else if (myGuide->getTaskID() == "haveAgaveAppList")
     {
@@ -469,6 +473,10 @@ void AgaveTaskReply::rawHttpTaskComplete()
     {
         emit haveStoppedJob(RequestState::GOOD);
     }
+    else if (myGuide->getTaskID() == "deleteJob")
+    {
+        emit haveDeletedJob(RequestState::GOOD);
+    }
     else if (myGuide->getTaskID() == "getAgaveList")
     {
         //TODO More error checking here
@@ -569,25 +577,23 @@ QList<RemoteJobData> AgaveTaskReply::parseJSONjobMetaData(QJsonArray rawJobList)
 
 RemoteJobData AgaveTaskReply::parseJSONjobDetails(QJsonObject rawJobData, bool haveDetails)
 {
-    RemoteJobData err;
-    if (!rawJobData.contains("id")) return err;
-    if (!rawJobData.contains("name")) return err;
-    if (!rawJobData.contains("appId")) return err;
-    if (!rawJobData.contains("created")) return err;
-    if (!rawJobData.contains("status")) return err;
+    if (!rawJobData.contains("id")) return RemoteJobData::nil();
+    if (!rawJobData.contains("name")) return RemoteJobData::nil();
+    if (!rawJobData.contains("appId")) return RemoteJobData::nil();
+    if (!rawJobData.contains("created")) return RemoteJobData::nil();
+    if (!rawJobData.contains("status")) return RemoteJobData::nil();
 
     if (haveDetails)
     {
-        if (!rawJobData.contains("inputs")) return err;
-        if (!rawJobData.contains("parameters")) return err;
+        if (!rawJobData.contains("inputs")) return RemoteJobData::nil();
+        if (!rawJobData.contains("parameters")) return RemoteJobData::nil();
     }
 
     RemoteJobData ret(rawJobData.value("id").toString(),
                       rawJobData.value("name").toString(),
                       rawJobData.value("appId").toString(),
+                      rawJobData.value("status").toString(),
                       parseAgaveTime(rawJobData.value("created").toString()));
-
-    ret.setState(rawJobData.value("status").toString());
 
     if (haveDetails)
     {
@@ -750,6 +756,7 @@ bool AgaveTaskReply::anySignalConnect()
     if (isSignalConnected(QMetaMethod::fromSignal(&AgaveTaskReply::haveJobList))) return true;
     if (isSignalConnected(QMetaMethod::fromSignal(&AgaveTaskReply::haveJobDetails))) return true;
     if (isSignalConnected(QMetaMethod::fromSignal(&AgaveTaskReply::haveStoppedJob))) return true;
+    if (isSignalConnected(QMetaMethod::fromSignal(&AgaveTaskReply::haveDeletedJob))) return true;
 
     if (isSignalConnected(QMetaMethod::fromSignal(&AgaveTaskReply::haveAgaveAppList))) return true;
 

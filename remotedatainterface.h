@@ -99,6 +99,7 @@ signals:
     void haveJobList(RequestState replyState, QList<RemoteJobData> jobList);
     void haveJobDetails(RequestState replyState, RemoteJobData jobData);
     void haveStoppedJob(RequestState replyState);
+    void haveDeletedJob(RequestState replyState);
 };
 
 class RemoteDataInterface : public QObject
@@ -140,6 +141,7 @@ public slots:
     virtual RemoteDataReply * getListOfJobs() = 0;
     virtual RemoteDataReply * getJobDetails(QString IDstr) = 0;
     virtual RemoteDataReply * stopJob(QString IDstr) = 0;
+    virtual RemoteDataReply * deleteJob(QString IDstr) = 0;
 
     virtual RemoteDataInterfaceState getInterfaceState() = 0;
 

@@ -812,15 +812,6 @@ bool FileOperator::nodeIsRoot(const FileNodeRef &theFile)
     return theNode->isRootNode();
 }
 
-void FileOperator::quickInfoPopup(QString infoText)
-{
-    //TODO: Slated for deletion, errors to be passed in status object
-    QMessageBox infoMessage;
-    infoMessage.setText(infoText);
-    infoMessage.setIcon(QMessageBox::Information);
-    infoMessage.exec();
-}
-
 bool FileOperator::deletePopup(const FileNodeRef &toDelete)
 {
     QMessageBox deleteQuery;
