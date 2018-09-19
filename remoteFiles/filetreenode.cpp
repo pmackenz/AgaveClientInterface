@@ -176,7 +176,7 @@ bool FileTreeNode::haveLStask()
 
 void FileTreeNode::setLStask(RemoteDataReply * newTask)
 {
-    if (!isFolder())
+    if (fileData.getFileType() != FileType::DIR)
     {
         qCDebug(fileManager, "ERROR: LS called on file rather than folder.");
         return;
@@ -198,9 +198,9 @@ bool FileTreeNode::haveBuffTask()
 
 void FileTreeNode::setBuffTask(RemoteDataReply * newTask)
 {
-    if (isFolder())
+    if (fileData.getFileType() != FileType::FILE)
     {
-        qCDebug(fileManager, "ERROR: Buffer download called on folder.");
+        qCDebug(fileManager, "ERROR: Buffer download called on non-file.");
         return;
     }
     if (bufferTask != nullptr)
@@ -229,16 +229,6 @@ FileTreeNode * FileTreeNode::getChildNodeWithName(QString filename)
         }
     }
     return nullptr;
-}
-
-bool FileTreeNode::isFolder()
-{
-    return (fileData.getFileType() == FileType::DIR);
-}
-
-bool FileTreeNode::isFile()
-{
-    return (fileData.getFileType() == FileType::FILE);
 }
 
 bool FileTreeNode::isChildOf(FileTreeNode * possibleParent)
@@ -344,7 +334,7 @@ void FileTreeNode::setNodeVisible()
 void FileTreeNode::recomputeNodeState()
 {
     if (myState == NodeState::DELETING) return;
-    if (isFolder())
+    if (fileData.getFileType() == FileType::DIR)
     {
         if (!nodeVisible)
         {
@@ -376,7 +366,7 @@ void FileTreeNode::recomputeNodeState()
             changeNodeState(NodeState::FOLDER_CONTENTS_LOADED); return;
         }
     }
-    else if (isFile())
+    else if (fileData.getFileType() == FileType::FILE)
     {
         if (!nodeVisible)
         {

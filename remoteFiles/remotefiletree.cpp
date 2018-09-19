@@ -78,7 +78,7 @@ void RemoteFileTree::selectRowByFile(FileNodeRef toSelect)
     selectRowByItem(nodeToFind);
 }
 
-void RemoteFileTree::setModelLink(FileOperator * theOperator)
+void RemoteFileTree::linkToFileOperator(FileOperator * theOperator)
 {
     myOperator = theOperator;
     myOperator->connectFileTreeWidget(this);

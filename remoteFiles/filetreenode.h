@@ -87,9 +87,6 @@ public:
     QList<FileTreeNode *> getChildList();
     FileTreeNode * getChildNodeWithName(QString filename);
 
-    bool isFolder();
-    bool isFile();
-
     bool isChildOf(FileTreeNode * possibleParent);
 
 private slots:
