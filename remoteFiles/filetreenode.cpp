@@ -40,6 +40,7 @@
 
 #include "remoteJobs/jobstandarditem.h"
 
+#include "filestandarditem.h"
 #include "filemetadata.h"
 #include "remotedatainterface.h"
 
@@ -94,6 +95,17 @@ FileTreeNode::~FileTreeNode()
         {
             myParent->childList.removeAll(this);
         }
+    }
+
+    if (decendantPlaceholderItem != nullptr)
+    {
+        delete decendantPlaceholderItem;
+        decendantPlaceholderItem = nullptr;
+    }
+
+    while (!modelItemList.isEmpty())
+    {
+        delete modelItemList.takeLast();
     }
 }
 
@@ -245,6 +257,17 @@ bool FileTreeNode::isChildOf(FileTreeNode * possibleParent)
         nodeToCheck = nodeToCheck->getParentNode();
     }
     return false;
+}
+
+QList<QStandardItem *> FileTreeNode::getModelItemList()
+{
+    QList<QStandardItem *> ret;
+    for (FileStandardItem * anItem : modelItemList)
+    {
+        ret.append(anItem);
+    }
+
+    return ret;
 }
 
 void FileTreeNode::deliverLSdata(RequestState taskState, QList<FileMetaData> dataList)
@@ -412,7 +435,115 @@ void FileTreeNode::changeNodeState(NodeState newState)
         this->deleteLater();
     }
 
+    recomputeModelItems();
+
     myFileOperator->fileNodesChange(fileData);
+}
+
+void FileTreeNode::recomputeModelItems()
+{
+    switch (myState) {
+    case NodeState::DELETING:
+    case NodeState::ERROR:
+    case NodeState::NON_EXTANT:
+        purgeModelItems();
+        return;
+    case NodeState::FILE_BUFF_LOADED:
+    case NodeState::FILE_BUFF_LOADING:
+    case NodeState::FILE_BUFF_RELOADING:
+    case NodeState::FILE_KNOWN:
+    case NodeState::FOLDER_CONTENTS_LOADING:
+    case NodeState::FOLDER_CONTENTS_RELOADING:
+    case NodeState::FOLDER_KNOWN_CONTENTS_NOT:
+        updateModelItems(false);
+        return;
+    case NodeState::FOLDER_CONTENTS_LOADED:
+        updateModelItems(true);
+        return;
+    case NodeState::FILE_SPECULATE_IDLE:
+    case NodeState::FILE_SPECULATE_LOADING:
+    case NodeState::FOLDER_SPECULATE_IDLE:
+    case NodeState::FOLDER_SPECULATE_LOADING:
+    case NodeState::INIT:
+        return;
+    }
+}
+
+void FileTreeNode::purgeModelItems()
+{
+    QStandardItem * parentItem = findParentItem();
+    if (parentItem == nullptr) return;
+
+    if (decendantPlaceholderItem != nullptr)
+    {
+        delete decendantPlaceholderItem;
+        decendantPlaceholderItem = nullptr;
+    }
+    while (!modelItemList.isEmpty()) delete modelItemList.takeLast();
+
+    if (parentItem->hasChildren()) return;
+    if (myParent->myState == NodeState::FOLDER_CONTENTS_LOADED)
+    {
+        parentItem->appendRow(new FileStandardItem(FileNodeRef::nil(), "Loading"));
+    }
+    else
+    {
+        parentItem->appendRow(new FileStandardItem(FileNodeRef::nil(), "Empty"));
+    }
+}
+
+void FileTreeNode::updateModelItems(bool folderContentsLoaded)
+{
+    QStandardItem * parentItem = findParentItem();
+    if (parentItem == nullptr) return;
+
+    if (modelItemList.isEmpty())
+    {
+        int i = 0;
+        while (modelItemList.size() < myFileOperator->getStandardModel()->columnCount())
+        {
+            modelItemList.append(new FileStandardItem(fileData,myFileOperator->getStandardModel()->horizontalHeaderItem(i)->text()));
+            i++;
+        }
+    }
+    else
+    {
+        for (FileStandardItem * anItem : modelItemList)
+        {
+            anItem->updateText(fileData);
+        }
+    }
+
+    if (decendantPlaceholderItem != nullptr)
+    {
+        delete decendantPlaceholderItem;
+        decendantPlaceholderItem = nullptr;
+    }
+
+    if (!childList.isEmpty()) return;
+
+    if (folderContentsLoaded)
+    {
+        decendantPlaceholderItem = new FileStandardItem(FileNodeRef::nil(), "Empty");
+    }
+    else
+    {
+        decendantPlaceholderItem = new FileStandardItem(FileNodeRef::nil(), "Loading");
+    }
+
+    modelItemList.first()->appendRow(decendantPlaceholderItem);
+}
+
+QStandardItem * FileTreeNode::findParentItem()
+{
+    if (fileData.isRootNode())
+    {
+        return myFileOperator->getStandardModel()->invisibleRootItem();
+    }
+    else
+    {
+        return myParent->modelItemList.first();
+    }
 }
 
 void FileTreeNode::settimestamps()

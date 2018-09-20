@@ -38,7 +38,6 @@
 #include "remotefiletree.h"
 #include "filetreenode.h"
 #include "filenoderef.h"
-#include "remotefilemodel.h"
 #include "filerecursiveoperator.h"
 
 #include "filemetadata.h"
@@ -55,8 +54,8 @@ FileOperator::FileOperator(RemoteDataInterface * theInterface, QObject *parent) 
     }
     myRecursiveHandler = new FileRecursiveOperator(this);
 
-    myModel = new RemoteFileModel(this);
-    QObject::connect(this, SIGNAL(fileSystemChange(FileNodeRef)), myModel, SLOT(newFileData(FileNodeRef)), Qt::QueuedConnection);
+    myModel.setColumnCount(tableNumCols);
+    myModel.setHorizontalHeaderLabels(shownHeaderLabelList);
 
     QObject::connect(myInterface, SIGNAL(connectionStateChanged(RemoteDataInterfaceState)), this, SLOT(interfaceHasNewState(RemoteDataInterfaceState)), Qt::QueuedConnection);
 }
@@ -73,11 +72,13 @@ FileOperator::~FileOperator()
 
 void FileOperator::connectFileTreeWidget(RemoteFileTree * connectedWidget)
 {
-    connectedWidget->setModel(myModel->getRawModel());
+    if (connectedWidget == nullptr) return;
+    connectedWidget->setModel(&myModel);
 }
 
 void FileOperator::disconnectFileTreeWidget(RemoteFileTree * connectedWidget)
 {
+    if (connectedWidget == nullptr) return;
     connectedWidget->setModel(nullptr);
 }
 
@@ -122,6 +123,11 @@ void FileOperator::enactFolderRefresh(const FileNodeRef &selectedNode, bool clea
     RemoteDataReply * theReply = myInterface->remoteLS(fullFilePath);
 
     trueNode->setLStask(theReply);
+}
+
+QStandardItemModel *FileOperator::getStandardModel()
+{
+    return &myModel;
 }
 
 bool FileOperator::operationIsPending()
@@ -597,6 +603,13 @@ bool FileOperator::nodeIsRoot(const FileNodeRef &theFile)
     return theNode->isRootNode();
 }
 
+QList<QStandardItem *> FileOperator::getModelRowByFile(const FileNodeRef &theFile)
+{
+    FileTreeNode * theNode = getFileNodeFromNodeRef(theFile);
+    if (theNode == nullptr) return QList<QStandardItem *>();
+    return theNode->getModelItemList();
+}
+
 bool FileOperator::deletePopup(const FileNodeRef &toDelete)
 {
     QMessageBox deleteQuery;
@@ -612,11 +625,6 @@ bool FileOperator::deletePopup(const FileNodeRef &toDelete)
           return false;
     }
     return false;
-}
-
-RemoteFileItem * FileOperator::getItemByFile(FileNodeRef toFind)
-{
-    return myModel->getItemByFile(toFind);
 }
 
 void FileOperator::emitStdFileOpErr(QString errString, RequestState errState)

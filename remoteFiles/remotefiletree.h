@@ -38,6 +38,7 @@
 
 #include <QTreeView>
 #include <QStandardItem>
+#include <QHeaderView>
 
 #include "filenoderef.h"
 
@@ -51,7 +52,7 @@ enum class FileColumn : int {FILENAME = 0,
                              MIME_TYPE = 5,
                              PERMISSIONS = 6};
 
-class RemoteFileItem;
+class FileStandardItem;
 class RemoteFileModel;
 enum class RequestState;
 

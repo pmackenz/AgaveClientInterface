@@ -40,24 +40,17 @@
 
 #include "filenoderef.h"
 
-class RemoteFileItem : public QStandardItem
+class FileStandardItem : public QStandardItem
 {
 public:
-    RemoteFileItem(bool isLoading);
-    RemoteFileItem(FileNodeRef fileInfo);
-    RemoteFileItem(RemoteFileItem * rowLeader);
-
-    RemoteFileItem * getRowHeader();
-    QList<RemoteFileItem*> getRowList();
+    FileStandardItem(FileNodeRef theJobData, QString relevantHeader);
     FileNodeRef getFile();
-    bool parentOfPlaceholder();
+
+    void updateText(FileNodeRef newData);
 
 private:
-    void appendToRowList(RemoteFileItem * toAdd);
-
-    RemoteFileItem * myRowLeader = nullptr;
-    QList<RemoteFileItem*> rowList;
     FileNodeRef myFile;
+    QString myColumnHeader;
 };
 
 #endif // REMOTEFILEITEM_H

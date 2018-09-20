@@ -54,7 +54,7 @@ class RemoteFileTree;
 class FileMetaData;
 class RemoteFileModel;
 class RemoteDataInterface;
-class RemoteFileItem;
+class FileStandardItem;
 class FileRecursiveOperator;
 
 enum class RequestState;
@@ -102,8 +102,6 @@ public:
 
     bool deletePopup(const FileNodeRef &toDelete);
 
-    RemoteFileItem * getItemByFile(FileNodeRef toFind);
-
 signals:
     //Note: it is very important that connections for these signals be queued
     void fileOpStarted();
@@ -123,7 +121,11 @@ protected:
     QList<FileNodeRef> getChildList(const FileNodeRef &theFile);
     bool nodeIsRoot(const FileNodeRef &theFile);
 
+    QList<QStandardItem *> getModelRowByFile(const FileNodeRef &theFile);
+
     void enactFolderRefresh(const FileNodeRef &selectedNode, bool clearData = false);
+
+    QStandardItemModel * getStandardModel();
 
 private slots:
     void interfaceHasNewState(RemoteDataInterfaceState newState);
@@ -151,7 +153,12 @@ private:
 
     FileTreeNode * rootFileNode = nullptr;
 
-    RemoteFileModel * myModel;
+    QStandardItemModel myModel;
+    //const int tableNumCols = 7;
+    //const QStringList shownHeaderLabelList = {"File Name","Type","Size","Last Changed",
+    //                               "Format","mimeType","Permissions"};
+    const int tableNumCols = 3;
+    const QStringList shownHeaderLabelList = {"File Name","Type","Size"};
 };
 
 #endif // FILEOPERATOR_H

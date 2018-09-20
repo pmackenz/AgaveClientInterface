@@ -35,8 +35,7 @@
 
 #include "remotefiletree.h"
 
-#include "remotefileitem.h"
-#include "remotefilemodel.h"
+#include "filestandarditem.h"
 #include "fileoperator.h"
 #include "filenoderef.h"
 
@@ -58,7 +57,7 @@ FileNodeRef RemoteFileTree::getSelectedFile()
 
     QStandardItem * theItem = theModel->itemFromIndex(indexList.at(0));
 
-    RemoteFileItem * retNode = dynamic_cast<RemoteFileItem *>(theItem);
+    FileStandardItem * retNode = dynamic_cast<FileStandardItem *>(theItem);
     if (retNode == nullptr) return FileNodeRef::nil();
     return retNode->getFile();
 }
@@ -68,22 +67,30 @@ void RemoteFileTree::selectRowByFile(FileNodeRef toSelect)
     if (myOperator == nullptr) return;
     if (toSelect.getFullPath() == getSelectedFile().getFullPath()) return;
 
-    RemoteFileItem * nodeToFind = myOperator->getItemByFile(toSelect);
-    if (nodeToFind == nullptr)
+    QList<QStandardItem *> nodeModelRow = toSelect.getModelRow();
+    if (nodeModelRow.isEmpty())
     {
         clearSelection();
         return;
     }
 
-    selectRowByItem(nodeToFind);
+    selectRowByItem(nodeModelRow.first());
 }
 
 void RemoteFileTree::linkToFileOperator(FileOperator * theOperator)
 {
+    if (myOperator != nullptr)
+    {
+        myOperator->disconnectFileTreeWidget(this);
+    }
     myOperator = theOperator;
-    myOperator->connectFileTreeWidget(this);
-    header()->resizeSection(0,350);
-    header()->resizeSection(1,40);
+    if (myOperator != nullptr)
+    {
+        myOperator->connectFileTreeWidget(this);
+        header()->resizeSection(0,350);
+        header()->resizeSection(1,40);
+    }
+    emit newFileSelected(FileNodeRef::nil());
 }
 
 void RemoteFileTree::folderExpanded(QModelIndex fileIndex)

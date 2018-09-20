@@ -42,6 +42,8 @@
 #include <QStandardItem>
 #include <QDateTime>
 
+class FileStandardItem;
+
 enum class NodeState {FILE_BUFF_LOADED, FILE_BUFF_RELOADING, FILE_BUFF_LOADING, FILE_KNOWN,
                       FILE_SPECULATE_IDLE, FILE_SPECULATE_LOADING,
                       FOLDER_CONTENTS_LOADED, FOLDER_CONTENTS_RELOADING, FOLDER_CONTENTS_LOADING, FOLDER_KNOWN_CONTENTS_NOT,
@@ -89,6 +91,8 @@ public:
 
     bool isChildOf(FileTreeNode * possibleParent);
 
+    QList<QStandardItem *> getModelItemList();
+
 private slots:
     void deliverLSdata(RequestState taskState, QList<FileMetaData> dataList);
     void deliverBuffData(RequestState taskState, QByteArray bufferData);
@@ -99,6 +103,11 @@ private:
     void recomputeNodeState();
 
     void changeNodeState(NodeState newState);
+    void recomputeModelItems();
+    void purgeModelItems();
+    void updateModelItems(bool folderContentsLoaded);
+    QStandardItem * findParentItem();
+
     void settimestamps();
 
     FileTreeNode * pathSearchHelper(QString filename, bool stopEarly);
@@ -127,6 +136,9 @@ private:
     bool folderContentsKnown = false;
     NodeState myState = NodeState::INIT;
     qint64 nodeTimestamp;
+
+    QList<FileStandardItem *> modelItemList;
+    FileStandardItem * decendantPlaceholderItem = nullptr;
 };
 
 #endif // FILETREENODE_H

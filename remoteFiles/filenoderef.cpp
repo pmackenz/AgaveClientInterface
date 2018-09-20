@@ -157,6 +157,16 @@ bool FileNodeRef::isRootNode() const
     return (myFileOperator->nodeIsRoot(*this));
 }
 
+QList<QStandardItem *> FileNodeRef::getModelRow() const
+{
+    if (myFileOperator == nullptr)
+    {
+        qCCritical(fileManager, "ERROR: attempted use of FileNodeRef without file operator.");
+        return QList<QStandardItem *>();
+    }
+    return (myFileOperator->getModelRowByFile(*this));
+}
+
 void FileNodeRef::enactFolderRefresh(bool clearData) const
 {
     if (myFileOperator == nullptr)
