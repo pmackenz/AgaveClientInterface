@@ -98,7 +98,6 @@ private slots:
     void deliverBuffData(RequestState taskState, QByteArray bufferData);
 
 private:
-    void slateNodeForDelete();
     void setNodeVisible();
     void recomputeNodeState();
 

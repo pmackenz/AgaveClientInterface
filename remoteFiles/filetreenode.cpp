@@ -53,7 +53,7 @@ FileTreeNode::FileTreeNode(FileMetaData contents, FileTreeNode * parent):QObject
     fileData.setFileOperator(myFileOperator);
     settimestamps();
 
-    parent->childList.append(this);
+    myParent->childList.append(this);
 
     recomputeNodeState();
 }
@@ -89,23 +89,28 @@ FileTreeNode::~FileTreeNode()
         delete this->fileDataBuffer;
     }
 
+    if (decendantPlaceholderItem != nullptr)
+    {
+        modelItemList.first()->removeRow(decendantPlaceholderItem->row());
+        decendantPlaceholderItem = nullptr;
+    }
+
+    if (!modelItemList.isEmpty())
+    {
+        QStandardItem * parentItem = findParentItem();
+        if (parentItem != nullptr)
+        {
+            parentItem->removeRow(modelItemList.first()->row());
+        }
+        modelItemList.clear();
+    }
+
     if (myParent != nullptr)
     {
         if (myParent->childList.contains(this))
         {
             myParent->childList.removeAll(this);
         }
-    }
-
-    if (decendantPlaceholderItem != nullptr)
-    {
-        delete decendantPlaceholderItem;
-        decendantPlaceholderItem = nullptr;
-    }
-
-    while (!modelItemList.isEmpty())
-    {
-        delete modelItemList.takeLast();
     }
 }
 
@@ -154,7 +159,6 @@ void FileTreeNode::deleteFolderContentsData()
 {
     folderContentsKnown = false;
     clearAllChildren();
-    recomputeNodeState();
 }
 
 void FileTreeNode::setFileBuffer(const QByteArray * newFileBuffer)
@@ -287,11 +291,8 @@ void FileTreeNode::deliverLSdata(RequestState taskState, QList<FileMetaData> dat
 
     if (taskState == RequestState::FILE_NOT_FOUND)
     {
-        if (!nodeVisible)
-        {
-            changeNodeState(NodeState::DELETING);
-            return;
-        }
+        changeNodeState(NodeState::DELETING);
+        return;
     }
     else
     {
@@ -321,11 +322,8 @@ void FileTreeNode::deliverBuffData(RequestState taskState, QByteArray bufferData
 
     if (taskState == RequestState::FILE_NOT_FOUND)
     {
-        if (!nodeVisible)
-        {
-            changeNodeState(NodeState::DELETING);
-            return;
-        }
+        changeNodeState(NodeState::DELETING);
+        return;
     }
     else
     {
@@ -333,12 +331,6 @@ void FileTreeNode::deliverBuffData(RequestState taskState, QByteArray bufferData
         //TODO: switch folder contents to show connect error
     }
     recomputeNodeState();
-}
-
-void FileTreeNode::slateNodeForDelete()
-{
-    if (myState == NodeState::DELETING) return;
-    changeNodeState(NodeState::DELETING);
 }
 
 void FileTreeNode::setNodeVisible()
@@ -427,6 +419,7 @@ void FileTreeNode::recomputeNodeState()
 
 void FileTreeNode::changeNodeState(NodeState newState)
 {
+    if (myState == NodeState::DELETING) return;
     if (newState == myState) return;
     myState = newState;
 
@@ -437,6 +430,7 @@ void FileTreeNode::changeNodeState(NodeState newState)
 
     recomputeModelItems();
 
+    if (!isRootNode()) myParent->recomputeNodeState();
     myFileOperator->fileNodesChange(fileData);
 }
 
@@ -476,19 +470,14 @@ void FileTreeNode::purgeModelItems()
 
     if (decendantPlaceholderItem != nullptr)
     {
-        delete decendantPlaceholderItem;
+        modelItemList.first()->removeRow(decendantPlaceholderItem->row());
         decendantPlaceholderItem = nullptr;
     }
-    while (!modelItemList.isEmpty()) delete modelItemList.takeLast();
 
-    if (parentItem->hasChildren()) return;
-    if (myParent->myState == NodeState::FOLDER_CONTENTS_LOADED)
+    if (!modelItemList.isEmpty())
     {
-        parentItem->appendRow(new FileStandardItem(FileNodeRef::nil(), "Loading"));
-    }
-    else
-    {
-        parentItem->appendRow(new FileStandardItem(FileNodeRef::nil(), "Empty"));
+        parentItem->removeRow(modelItemList.first()->row());
+        modelItemList.clear();
     }
 }
 
@@ -505,6 +494,12 @@ void FileTreeNode::updateModelItems(bool folderContentsLoaded)
             modelItemList.append(new FileStandardItem(fileData,myFileOperator->getStandardModel()->horizontalHeaderItem(i)->text()));
             i++;
         }
+        QList<QStandardItem *> tempRowList;
+        for (FileStandardItem * anItem : modelItemList)
+        {
+            tempRowList.append(anItem);
+        }
+        parentItem->appendRow(tempRowList);
     }
     else
     {
@@ -516,10 +511,11 @@ void FileTreeNode::updateModelItems(bool folderContentsLoaded)
 
     if (decendantPlaceholderItem != nullptr)
     {
-        delete decendantPlaceholderItem;
+        modelItemList.first()->removeRow(decendantPlaceholderItem->row());
         decendantPlaceholderItem = nullptr;
     }
 
+    if (fileData.getFileType() != FileType::DIR) return;
     if (!childList.isEmpty()) return;
 
     if (folderContentsLoaded)
@@ -536,7 +532,7 @@ void FileTreeNode::updateModelItems(bool folderContentsLoaded)
 
 QStandardItem * FileTreeNode::findParentItem()
 {
-    if (fileData.isRootNode())
+    if (isRootNode())
     {
         return myFileOperator->getStandardModel()->invisibleRootItem();
     }

@@ -378,13 +378,13 @@ RemoteDataReply * AgaveHandler::downloadBuffer(QString remoteName)
     return qobject_cast<RemoteDataReply *>(theReply);
 }
 
-AgaveTaskReply * AgaveHandler::getAgaveAppList()
+RemoteDataReply * AgaveHandler::getAgaveAppList()
 {
     if (QThread::currentThread() != this->thread())
     {
-        AgaveTaskReply * retVal = nullptr;
+        RemoteDataReply * retVal = nullptr;
         QMetaObject::invokeMethod(this, "getAgaveAppList", Qt::BlockingQueuedConnection,
-                                  Q_RETURN_ARG(AgaveTaskReply *, retVal));
+                                  Q_RETURN_ARG(RemoteDataReply *, retVal));
         return retVal;
     }
 

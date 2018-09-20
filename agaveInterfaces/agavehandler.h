@@ -102,7 +102,7 @@ public slots:
     //and the remoteWorkingDir will be used as a input/parameter named in remoteDirParameter (optional)
 
     //For debugging purposes, to retrive the list of available Agave Apps:
-    AgaveTaskReply * getAgaveAppList();
+    RemoteDataReply * getAgaveAppList();
 
     void setAgaveConnectionParams(QString tenant, QString clientId, QString storage);
 
