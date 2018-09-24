@@ -52,7 +52,6 @@ AgaveHandler::AgaveHandler(QNetworkAccessManager *netAccessManager, QObject *par
     if (networkHandle == nullptr)
     {
         qFatal("Internal ERROR: AgaveHandler pointer to QNetworkAccessManager connot be NULL");
-        return;
     }
 }
 
@@ -378,13 +377,13 @@ RemoteDataReply * AgaveHandler::downloadBuffer(QString remoteName)
     return qobject_cast<RemoteDataReply *>(theReply);
 }
 
-RemoteDataReply * AgaveHandler::getAgaveAppList()
+AgaveTaskReply * AgaveHandler::getAgaveAppList()
 {
     if (QThread::currentThread() != this->thread())
     {
-        RemoteDataReply * retVal = nullptr;
+        AgaveTaskReply * retVal = nullptr;
         QMetaObject::invokeMethod(this, "getAgaveAppList", Qt::BlockingQueuedConnection,
-                                  Q_RETURN_ARG(RemoteDataReply *, retVal));
+                                  Q_RETURN_ARG(AgaveTaskReply *, retVal));
         return retVal;
     }
 
@@ -1304,8 +1303,6 @@ QNetworkReply * AgaveHandler::distillRequestData(AgaveTaskGuide * taskGuide, QMa
         qCDebug(remoteInterface, "ERROR: Non-existant Agave request type requested.");
         return nullptr;
     }
-
-    return nullptr;
 }
 
 QNetworkReply * AgaveHandler::finalizeAgaveRequest(AgaveTaskGuide * theGuide, QString urlAppend, QByteArray * authHeader, QByteArray postData, QIODevice * fileHandle)

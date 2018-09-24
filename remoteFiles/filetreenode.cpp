@@ -163,21 +163,14 @@ void FileTreeNode::deleteFolderContentsData()
 
 void FileTreeNode::setFileBuffer(const QByteArray * newFileBuffer)
 {
-    if (fileDataBuffer == nullptr)
+    if (fileDataBuffer != nullptr) delete fileDataBuffer;
+
+    if (newFileBuffer == nullptr)
     {
-        if (newFileBuffer != nullptr)
-        {
-            fileDataBuffer = new QByteArray(*newFileBuffer);
-        }
-    }
-    else if (newFileBuffer == nullptr)
-    {
-        delete fileDataBuffer;
         fileDataBuffer = nullptr;
     }
     else
     {
-        delete fileDataBuffer;
         fileDataBuffer = new QByteArray(*newFileBuffer);
     }
 
@@ -192,6 +185,7 @@ bool FileTreeNode::haveLStask()
 
 void FileTreeNode::setLStask(RemoteDataReply * newTask)
 {
+    if (newTask == nullptr) return;
     if (fileData.getFileType() != FileType::DIR)
     {
         qCDebug(fileManager, "ERROR: LS called on file rather than folder.");
@@ -214,6 +208,7 @@ bool FileTreeNode::haveBuffTask()
 
 void FileTreeNode::setBuffTask(RemoteDataReply * newTask)
 {
+    if (newTask == nullptr) return;
     if (fileData.getFileType() != FileType::FILE)
     {
         qCDebug(fileManager, "ERROR: Buffer download called on non-file.");
@@ -516,7 +511,11 @@ void FileTreeNode::updateModelItems(bool folderContentsLoaded)
     }
 
     if (fileData.getFileType() != FileType::DIR) return;
-    if (!childList.isEmpty()) return;
+
+    for (FileTreeNode * aChild : childList)
+    {
+        if (aChild->nodeVisible) return;
+    }
 
     if (folderContentsLoaded)
     {

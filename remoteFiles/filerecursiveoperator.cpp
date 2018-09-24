@@ -48,7 +48,9 @@ FileRecursiveOperator::FileRecursiveOperator(FileOperator *parent) : QObject(par
     recursiveRemoteHead = FileNodeRef::nil();
 
     QObject::connect(myOperator, SIGNAL(fileSystemChange(FileNodeRef)),
-                     this, SLOT(newFileSystemData(FileNodeRef)));
+                     this, SLOT(newFileSystemDataInterlock(FileNodeRef)), Qt::QueuedConnection);
+    QObject::connect(this, SIGNAL(newFileInterlockSignal()),
+                     this, SLOT(newFileSystemData()), Qt::QueuedConnection);
 }
 
 RecursiveOpState FileRecursiveOperator::getState()
@@ -168,8 +170,16 @@ void FileRecursiveOperator::abortRecursiveProcess()
     fileOpDone(RequestState::STOPPED_BY_USER, toDisplay);
 }
 
-void FileRecursiveOperator::newFileSystemData(FileNodeRef)
+void FileRecursiveOperator::newFileSystemDataInterlock(FileNodeRef)
 {
+    if (interlockHasFileChange) return;
+    interlockHasFileChange = true;
+    emit newFileInterlockSignal();
+}
+
+void FileRecursiveOperator::newFileSystemData()
+{
+    interlockHasFileChange = false;
     if (myState == RecursiveOpState::REC_DOWNLOAD)
     {
         recursiveDownloadProcessRetry();

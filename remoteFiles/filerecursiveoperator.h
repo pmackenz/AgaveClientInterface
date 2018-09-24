@@ -66,9 +66,11 @@ signals:
     //Note: it is very important that connections for these signals be queued
     void fileOpStarted();
     void fileOpDone(RequestState opState, QString err_msg);
+    void newFileInterlockSignal();
 
 private slots:
-    void newFileSystemData(FileNodeRef);
+    void newFileSystemDataInterlock(FileNodeRef);
+    void newFileSystemData();
 
 protected:
     void getRecursiveUploadReply(RequestState replyState, FileMetaData newFileData);
@@ -86,6 +88,7 @@ private:
     void emitStdFileOpErr(QString errString, RequestState errState);
 
     FileOperator * myOperator;
+    bool interlockHasFileChange = false;
 
     RecursiveOpState myState;
 

@@ -73,23 +73,23 @@ public:
     NodeState getNodeState();
     FileNodeRef getFileData();
     QByteArray * getFileBuffer();
+    FileTreeNode * getParentNode();
+    QList<FileTreeNode *> getChildList();
+
     FileTreeNode * getNodeWithName(QString filename);
     FileTreeNode * getClosestNodeWithName(QString filename);
-    FileTreeNode * getParentNode();
     FileTreeNode * getNodeReletiveToNodeWithName(QString searchPath);
+    FileTreeNode * getChildNodeWithName(QString filename);
 
-    void deleteFolderContentsData();
-    void setFileBuffer(const QByteArray *newFileBuffer);
+    bool isChildOf(FileTreeNode * possibleParent);
 
     bool haveLStask();
     void setLStask(RemoteDataReply * newTask);
     bool haveBuffTask();
     void setBuffTask(RemoteDataReply * newTask);
 
-    QList<FileTreeNode *> getChildList();
-    FileTreeNode * getChildNodeWithName(QString filename);
-
-    bool isChildOf(FileTreeNode * possibleParent);
+    void deleteFolderContentsData();
+    void setFileBuffer(const QByteArray *newFileBuffer);
 
     QList<QStandardItem *> getModelItemList();
 
