@@ -84,25 +84,11 @@ FileTreeNode::~FileTreeNode()
         FileTreeNode * toDelete = this->childList.takeLast();
         delete toDelete;
     }
+    purgeModelItems();
+
     if (this->fileDataBuffer != nullptr)
     {
         delete this->fileDataBuffer;
-    }
-
-    if (decendantPlaceholderItem != nullptr)
-    {
-        modelItemList.first()->removeRow(decendantPlaceholderItem->row());
-        decendantPlaceholderItem = nullptr;
-    }
-
-    if (!modelItemList.isEmpty())
-    {
-        QStandardItem * parentItem = findParentItem();
-        if (parentItem != nullptr)
-        {
-            parentItem->removeRow(modelItemList.first()->row());
-        }
-        modelItemList.clear();
     }
 
     if (myParent != nullptr)
@@ -424,8 +410,7 @@ void FileTreeNode::changeNodeState(NodeState newState)
     }
 
     recomputeModelItems();
-
-    if (!isRootNode()) myParent->recomputeNodeState();
+    if (!isRootNode()) myParent->recomputeModelItems();
     myFileOperator->fileNodesChange(fileData);
 }
 
@@ -461,7 +446,14 @@ void FileTreeNode::recomputeModelItems()
 void FileTreeNode::purgeModelItems()
 {
     QStandardItem * parentItem = findParentItem();
-    if (parentItem == nullptr) return;
+    if (parentItem == nullptr)
+    {
+        decendantPlaceholderItem = nullptr;
+        modelItemList.clear();
+        return;
+    }
+
+    if (modelItemList.isEmpty()) return;
 
     if (decendantPlaceholderItem != nullptr)
     {
@@ -469,17 +461,19 @@ void FileTreeNode::purgeModelItems()
         decendantPlaceholderItem = nullptr;
     }
 
-    if (!modelItemList.isEmpty())
-    {
-        parentItem->removeRow(modelItemList.first()->row());
-        modelItemList.clear();
-    }
+    parentItem->removeRow(modelItemList.first()->row());
+    modelItemList.clear();
 }
 
 void FileTreeNode::updateModelItems(bool folderContentsLoaded)
 {
     QStandardItem * parentItem = findParentItem();
-    if (parentItem == nullptr) return;
+    if (parentItem == nullptr)
+    {
+        decendantPlaceholderItem = nullptr;
+        modelItemList.clear();
+        return;
+    }
 
     if (modelItemList.isEmpty())
     {
@@ -537,6 +531,7 @@ QStandardItem * FileTreeNode::findParentItem()
     }
     else
     {
+        if (myParent->modelItemList.isEmpty()) return nullptr;
         return myParent->modelItemList.first();
     }
 }
