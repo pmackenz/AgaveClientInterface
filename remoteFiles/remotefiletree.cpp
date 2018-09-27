@@ -67,14 +67,14 @@ void RemoteFileTree::selectRowByFile(FileNodeRef toSelect)
     if (myOperator == nullptr) return;
     if (toSelect.getFullPath() == getSelectedFile().getFullPath()) return;
 
-    QList<QStandardItem *> nodeModelRow = toSelect.getModelRow();
-    if (nodeModelRow.isEmpty())
+    QPersistentModelIndex nodeModelRow = toSelect.getFirstModelIndex();
+    if (!nodeModelRow.isValid())
     {
         clearSelection();
         return;
     }
 
-    selectRowByItem(nodeModelRow.first());
+    selectRowByIndex(nodeModelRow);
 }
 
 void RemoteFileTree::linkToFileOperator(FileOperator * theOperator)
@@ -106,14 +106,13 @@ void RemoteFileTree::folderExpanded(QModelIndex fileIndex)
 void RemoteFileTree::fileEntryTouched(QModelIndex itemTouched)
 {
     this->selectionModel()->clearSelection();
-    QStandardItemModel * dataStore = qobject_cast<QStandardItemModel *>(this->model());
-    QStandardItem * selectedItem = dataStore->itemFromIndex(itemTouched);
-    if (selectedItem == nullptr)
+
+    if (!itemTouched.isValid())
     {
         return;
     }
 
-    selectRowByItem(selectedItem);
+    selectRowByIndex(itemTouched);
 }
 
 void RemoteFileTree::forceSelectionRefresh()
@@ -121,18 +120,11 @@ void RemoteFileTree::forceSelectionRefresh()
     emit newFileSelected(getSelectedFile());
 }
 
-void RemoteFileTree::selectRowByItem(QStandardItem *clickedNode)
+void RemoteFileTree::selectRowByIndex(QModelIndex clickedNode)
 {
-    QStandardItem * parentNode = clickedNode->parent();
-    if (parentNode == nullptr)
-    {
-        parentNode = clickedNode->model()->invisibleRootItem();
-    }
+    QModelIndex firstNode = clickedNode.sibling(clickedNode.row(),0);
+    QModelIndex lastNode = clickedNode.sibling(clickedNode.row(),model()->columnCount() - 1);
 
-    int rowNum = clickedNode->row();
-
-    this->selectionModel()->select(QItemSelection(parentNode->child(rowNum,0)->index(),
-                                                  parentNode->child(rowNum,parentNode->columnCount()-1)->index()),
-                                   QItemSelectionModel::Select);
+    this->selectionModel()->select(QItemSelection(firstNode, lastNode), QItemSelectionModel::Select);
     emit newFileSelected(getSelectedFile());
 }

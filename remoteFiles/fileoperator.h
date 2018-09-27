@@ -121,7 +121,7 @@ protected:
     QList<FileNodeRef> getChildList(const FileNodeRef &theFile);
     bool nodeIsRoot(const FileNodeRef &theFile);
 
-    QList<QStandardItem *> getModelRowByFile(const FileNodeRef &theFile);
+    QPersistentModelIndex getModelIndexByFile(const FileNodeRef &theFile);
 
     void enactFolderRefresh(const FileNodeRef &selectedNode, bool clearData = false);
 

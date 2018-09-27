@@ -244,15 +244,10 @@ bool FileTreeNode::isChildOf(FileTreeNode * possibleParent)
     return false;
 }
 
-QList<QStandardItem *> FileTreeNode::getModelItemList()
+QPersistentModelIndex FileTreeNode::getFirstModelIndex()
 {
-    QList<QStandardItem *> ret;
-    for (FileStandardItem * anItem : modelItemList)
-    {
-        ret.append(anItem);
-    }
-
-    return ret;
+    if (modelItemList.isEmpty()) return QPersistentModelIndex();
+    return modelItemList.first();
 }
 
 void FileTreeNode::deliverLSdata(RequestState taskState, QList<FileMetaData> dataList)
@@ -445,63 +440,78 @@ void FileTreeNode::recomputeModelItems()
 
 void FileTreeNode::purgeModelItems()
 {
-    QStandardItem * parentItem = findParentItem();
-    if (parentItem == nullptr)
-    {
-        decendantPlaceholderItem = nullptr;
-        modelItemList.clear();
-        return;
-    }
-
     if (modelItemList.isEmpty()) return;
 
-    if (decendantPlaceholderItem != nullptr)
+    if (decendantPlaceholderItem.isValid())
     {
-        modelItemList.first()->removeRow(decendantPlaceholderItem->row());
-        decendantPlaceholderItem = nullptr;
+        myFileOperator->myModel.removeRow(decendantPlaceholderItem.row(), modelItemList.first());
     }
 
-    parentItem->removeRow(modelItemList.first()->row());
+    QModelIndex parentItem = modelItemList.first().parent();
+
+    if (parentItem.isValid())
+    {
+        myFileOperator->myModel.removeRow(modelItemList.first().row(), parentItem);
+    }
+    else
+    {
+        myFileOperator->myModel.removeRow(modelItemList.first().row());
+    }
+
     modelItemList.clear();
+    decendantPlaceholderItem = QPersistentModelIndex();
 }
 
 void FileTreeNode::updateModelItems(bool folderContentsLoaded)
 {
-    QStandardItem * parentItem = findParentItem();
-    if (parentItem == nullptr)
-    {
-        decendantPlaceholderItem = nullptr;
-        modelItemList.clear();
-        return;
-    }
-
     if (modelItemList.isEmpty())
     {
         int i = 0;
-        while (modelItemList.size() < myFileOperator->getStandardModel()->columnCount())
+        QList<QStandardItem *> tempRowList;
+        while (i < myFileOperator->getStandardModel()->columnCount())
         {
-            modelItemList.append(new FileStandardItem(fileData,myFileOperator->getStandardModel()->horizontalHeaderItem(i)->text()));
+            QStandardItem * itemToInsert = new FileStandardItem(fileData,myFileOperator->getStandardModel()->horizontalHeaderItem(i)->text());
+            tempRowList.append(itemToInsert);
             i++;
         }
-        QList<QStandardItem *> tempRowList;
-        for (FileStandardItem * anItem : modelItemList)
+        if (myParent == nullptr)
         {
-            tempRowList.append(anItem);
+            myFileOperator->getStandardModel()->appendRow(tempRowList);
         }
-        parentItem->appendRow(tempRowList);
+        else
+        {
+            QPersistentModelIndex parentIndex = myParent->modelItemList.first();
+            if (!parentIndex.isValid())
+            {
+                decendantPlaceholderItem = QPersistentModelIndex();
+                modelItemList.clear();
+                for (QStandardItem * anItem : tempRowList)
+                {
+                    delete anItem;
+                }
+                return;
+            }
+            myFileOperator->getStandardModel()->itemFromIndex(parentIndex)->appendRow(tempRowList);
+        }
+
+        for (QStandardItem * anItem : tempRowList)
+        {
+            QPersistentModelIndex anIndex(anItem->index());
+            modelItemList.append(anIndex);
+        }
     }
     else
     {
-        for (FileStandardItem * anItem : modelItemList)
+        for (QPersistentModelIndex anIndex : modelItemList)
         {
-            anItem->updateText(fileData);
+            dynamic_cast<FileStandardItem *>(myFileOperator->myModel.itemFromIndex(anIndex))->updateText(fileData);
         }
     }
 
-    if (decendantPlaceholderItem != nullptr)
+    if (decendantPlaceholderItem.isValid())
     {
-        modelItemList.first()->removeRow(decendantPlaceholderItem->row());
-        decendantPlaceholderItem = nullptr;
+        myFileOperator->myModel.itemFromIndex(modelItemList.first())->removeRow(decendantPlaceholderItem.row());
+        decendantPlaceholderItem = QPersistentModelIndex();
     }
 
     if (fileData.getFileType() != FileType::DIR) return;
@@ -511,29 +521,18 @@ void FileTreeNode::updateModelItems(bool folderContentsLoaded)
         if (aChild->nodeVisible) return;
     }
 
+    QStandardItem * newItem;
     if (folderContentsLoaded)
     {
-        decendantPlaceholderItem = new FileStandardItem(FileNodeRef::nil(), "Empty");
+        newItem = new FileStandardItem(FileNodeRef::nil(), "Empty");
     }
     else
     {
-        decendantPlaceholderItem = new FileStandardItem(FileNodeRef::nil(), "Loading");
+        newItem = new FileStandardItem(FileNodeRef::nil(), "Loading");
     }
 
-    modelItemList.first()->appendRow(decendantPlaceholderItem);
-}
-
-QStandardItem * FileTreeNode::findParentItem()
-{
-    if (isRootNode())
-    {
-        return myFileOperator->getStandardModel()->invisibleRootItem();
-    }
-    else
-    {
-        if (myParent->modelItemList.isEmpty()) return nullptr;
-        return myParent->modelItemList.first();
-    }
+    myFileOperator->getStandardModel()->itemFromIndex(modelItemList.first())->appendRow(newItem);
+    decendantPlaceholderItem = QPersistentModelIndex(newItem->index());
 }
 
 void FileTreeNode::settimestamps()

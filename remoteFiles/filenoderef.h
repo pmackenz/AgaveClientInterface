@@ -65,7 +65,7 @@ public:
     QList<FileNodeRef> getChildList() const;
     bool isRootNode() const;
 
-    QList<QStandardItem *> getModelRow() const;
+    QPersistentModelIndex getFirstModelIndex() const;
 
     void enactFolderRefresh(bool clearData = false) const;
 

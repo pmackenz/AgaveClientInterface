@@ -41,6 +41,7 @@
 #include <QObject>
 #include <QStandardItem>
 #include <QDateTime>
+#include <QPersistentModelIndex>
 
 class FileStandardItem;
 
@@ -91,7 +92,7 @@ public:
     void deleteFolderContentsData();
     void setFileBuffer(const QByteArray *newFileBuffer);
 
-    QList<QStandardItem *> getModelItemList();
+    QPersistentModelIndex getFirstModelIndex();
 
 private slots:
     void deliverLSdata(RequestState taskState, QList<FileMetaData> dataList);
@@ -105,7 +106,6 @@ private:
     void recomputeModelItems();
     void purgeModelItems();
     void updateModelItems(bool folderContentsLoaded);
-    QStandardItem * findParentItem();
 
     void settimestamps();
 
@@ -136,8 +136,8 @@ private:
     NodeState myState = NodeState::INIT;
     qint64 nodeTimestamp;
 
-    QList<FileStandardItem *> modelItemList;
-    FileStandardItem * decendantPlaceholderItem = nullptr;
+    QList<QPersistentModelIndex> modelItemList;
+    QPersistentModelIndex decendantPlaceholderItem;
 };
 
 #endif // FILETREENODE_H

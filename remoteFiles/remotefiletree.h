@@ -37,7 +37,7 @@
 #define REMOTEFILEWINDOW_H
 
 #include <QTreeView>
-#include <QStandardItem>
+#include <QPersistentModelIndex>
 #include <QHeaderView>
 
 #include "filenoderef.h"
@@ -78,7 +78,7 @@ private slots:
     void folderExpanded(QModelIndex itemOpened);
 
 private:
-    void selectRowByItem(QStandardItem *linkedItem);
+    void selectRowByIndex(QModelIndex linkedItem);
 
     FileOperator * myOperator = nullptr;
 };

@@ -603,11 +603,11 @@ bool FileOperator::nodeIsRoot(const FileNodeRef &theFile)
     return theNode->isRootNode();
 }
 
-QList<QStandardItem *> FileOperator::getModelRowByFile(const FileNodeRef &theFile)
+QPersistentModelIndex FileOperator::getModelIndexByFile(const FileNodeRef &theFile)
 {
     FileTreeNode * theNode = getFileNodeFromNodeRef(theFile);
-    if (theNode == nullptr) return QList<QStandardItem *>();
-    return theNode->getModelItemList();
+    if (theNode == nullptr) return QPersistentModelIndex();
+    return theNode->getFirstModelIndex();
 }
 
 bool FileOperator::deletePopup(const FileNodeRef &toDelete)
@@ -624,7 +624,6 @@ bool FileOperator::deletePopup(const FileNodeRef &toDelete)
       default:
           return false;
     }
-    return false;
 }
 
 void FileOperator::emitStdFileOpErr(QString errString, RequestState errState)
