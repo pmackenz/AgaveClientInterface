@@ -65,6 +65,7 @@ protected:
     void setData(RemoteJobData newData);
     bool haveDetailTask();
     void setDetailTask(RemoteDataReply * newTask);
+    void setJobState(QString newState);
 
 private slots:
     void deliverJobDetails(RequestState taskState, RemoteJobData fullJobData);

@@ -461,7 +461,7 @@ bool FileOperator::isAncestorOf(const FileNodeRef &parent, const FileNodeRef &ch
     return childNode->isChildOf(parentNode);
 }
 
-const FileNodeRef FileOperator::speculateFileWithName(QString fullPath, bool folder)
+const FileNodeRef FileOperator::speculateFileWithName(QString fullPath, bool folder, bool loadBuffer)
 {
     FileTreeNode * scanNode = rootFileNode->getNodeWithName(fullPath);
     if (scanNode != nullptr)
@@ -491,12 +491,14 @@ const FileNodeRef FileOperator::speculateFileWithName(QString fullPath, bool fol
             accountedParts--;
         }
     }
-    return speculateFileWithName(scanNode->getFileData(), pathSoFar, folder);
+    return speculateFileWithName(scanNode->getFileData(), pathSoFar, folder, loadBuffer);
 }
 
-const FileNodeRef FileOperator::speculateFileWithName(const FileNodeRef &baseNode, QString addedPath, bool folder)
+const FileNodeRef FileOperator::speculateFileWithName(const FileNodeRef &baseNode, QString addedPath, bool folder, bool loadBuffer)
 {
     FileTreeNode * searchNode = getFileNodeFromNodeRef(baseNode);
+    if (searchNode == nullptr) return FileNodeRef::nil();
+
     QStringList pathParts = FileMetaData::getPathNameList(addedPath);
     for (auto itr = pathParts.cbegin(); itr != pathParts.cend(); itr++)
     {
@@ -541,7 +543,7 @@ const FileNodeRef FileOperator::speculateFileWithName(const FileNodeRef &baseNod
             enactFolderRefresh(searchNode->getFileData());
         }
     }
-    else if (searchNode->getFileBuffer() == nullptr)
+    else if ((searchNode->getFileBuffer() == nullptr) && loadBuffer)
     {
         sendDownloadBuffReq(searchNode->getFileData());
     }

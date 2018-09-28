@@ -76,8 +76,8 @@ public:
     void connectFileTreeWidget(RemoteFileTree * connectedWidget);
     void disconnectFileTreeWidget(RemoteFileTree * connectedWidget);
 
-    const FileNodeRef speculateFileWithName(QString fullPath, bool folder);
-    const FileNodeRef speculateFileWithName(const FileNodeRef &baseNode, QString addedPath, bool folder);
+    const FileNodeRef speculateFileWithName(QString fullPath, bool folder, bool loadBuffer = true);
+    const FileNodeRef speculateFileWithName(const FileNodeRef &baseNode, QString addedPath, bool folder, bool loadBuffer = true);
 
     bool operationIsPending();
 

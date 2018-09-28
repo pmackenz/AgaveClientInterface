@@ -140,12 +140,14 @@ void JobListNode::setDetailTask(RemoteDataReply * newTask)
                      this, SLOT(deliverJobDetails(RequestState,RemoteJobData)));
 }
 
+void JobListNode::setJobState(QString newState)
+{
+    myData.setState(newState);
+}
+
 void JobListNode::deliverJobDetails(RequestState taskState, RemoteJobData fullJobData)
 {
-    if (myDetailTask == QObject::sender())
-    {
-        myDetailTask = nullptr;
-    }
+    myDetailTask = nullptr;
     if (taskState != RequestState::GOOD)
     {
         qCDebug(jobManager, "Unable to get task details");
@@ -163,5 +165,5 @@ void JobListNode::deliverJobDetails(RequestState taskState, RemoteJobData fullJo
         qCDebug(jobManager, "ERROR: Job details query reply does not have details data.");
     }
 
-    myData.setDetails(fullJobData.getInputs(), fullJobData.getParams());
+    setDetails(fullJobData.getInputs(), fullJobData.getParams());
 }
