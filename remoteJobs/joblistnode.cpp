@@ -55,7 +55,7 @@ JobListNode::~JobListNode()
 {
     if (!myModelRow.isEmpty())
     {
-        myOperator->getItemModel()->removeRow(myModelRow.first()->row());
+        myOperator->getItemModel()->removeRow(myModelRow.first().row());
         myModelRow.clear();
     }
 }
@@ -78,23 +78,28 @@ void JobListNode::setData(RemoteJobData newData)
     {
         int i = 0;
         QStandardItem * headerItem = myOperator->getItemModel()->horizontalHeaderItem(i);
+        QList<QStandardItem *> newRow;
         while (headerItem != nullptr)
         {
             QString headerText = headerItem->text();
-
-            myModelRow.append(new JobStandardItem(myData, headerText));
+            QStandardItem * newItem = new JobStandardItem(myData, headerText);
+            newRow.append(newItem);
 
             i++;
             headerItem = myOperator->getItemModel()->horizontalHeaderItem(i);
         }
 
-        myOperator->getItemModel()->insertRow(0, myModelRow);
+        myOperator->getItemModel()->insertRow(0, newRow);
+        for (QStandardItem * anItem : newRow)
+        {
+            myModelRow.append(QPersistentModelIndex(anItem->index()));
+        }
     }
 
-    for (QStandardItem * anItem : myModelRow)
+    for (QPersistentModelIndex anIndex : myModelRow)
     {
-        JobStandardItem * theModelEntry = dynamic_cast<JobStandardItem *>(anItem);
-        theModelEntry->updateText(myData);
+        JobStandardItem * theModelEntry = dynamic_cast<JobStandardItem *>(myOperator->getItemModel()->itemFromIndex(anIndex));
+        if (theModelEntry != nullptr) theModelEntry->updateText(myData);
     }
 
     if (signalChange)
@@ -135,12 +140,14 @@ void JobListNode::setDetailTask(RemoteDataReply * newTask)
                      this, SLOT(deliverJobDetails(RequestState,RemoteJobData)));
 }
 
+void JobListNode::setJobState(QString newState)
+{
+    myData.setState(newState);
+}
+
 void JobListNode::deliverJobDetails(RequestState taskState, RemoteJobData fullJobData)
 {
-    if (myDetailTask == QObject::sender())
-    {
-        myDetailTask = nullptr;
-    }
+    myDetailTask = nullptr;
     if (taskState != RequestState::GOOD)
     {
         qCDebug(jobManager, "Unable to get task details");
@@ -158,5 +165,5 @@ void JobListNode::deliverJobDetails(RequestState taskState, RemoteJobData fullJo
         qCDebug(jobManager, "ERROR: Job details query reply does not have details data.");
     }
 
-    myData.setDetails(fullJobData.getInputs(), fullJobData.getParams());
+    setDetails(fullJobData.getInputs(), fullJobData.getParams());
 }

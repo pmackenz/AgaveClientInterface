@@ -38,6 +38,7 @@
 
 #include <QObject>
 #include <QStandardItem>
+#include <QPersistentModelIndex>
 
 class JobStandardItem;
 class RemoteDataReply;
@@ -64,6 +65,7 @@ protected:
     void setData(RemoteJobData newData);
     bool haveDetailTask();
     void setDetailTask(RemoteDataReply * newTask);
+    void setJobState(QString newState);
 
 private slots:
     void deliverJobDetails(RequestState taskState, RemoteJobData fullJobData);
@@ -73,7 +75,7 @@ private:
     JobOperator * myOperator;
     RemoteJobData myData;
 
-    QList<QStandardItem *> myModelRow;
+    QList<QPersistentModelIndex> myModelRow;
 
     RemoteDataReply * myDetailTask = nullptr;
 };
