@@ -33,6 +33,19 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
+/*! \mainpage My Personal Index Page
+ *
+ * \section intro_sec Introduction
+ *
+ * This is the introduction.
+ *
+ * \section install_sec Installation
+ *
+ * \subsection step1 Step 1: Opening the box
+ *
+ * etc...
+ */
+
 #ifndef REMOTEDATAINTERFACE_H
 #define REMOTEDATAINTERFACE_H
 
@@ -102,12 +115,22 @@ signals:
     void haveDeletedJob(RequestState replyState);
 };
 
+/*! \brief Brief class description.
+ *         Brief class description continued.
+ *
+ *  Detailed class description starts here.
+ */
 class RemoteDataInterface : public QObject
 {
     Q_OBJECT
 
 public:
     RemoteDataInterface(QObject * parent = nullptr);
+    /*! \brief Brief Constructor description.
+     *         Brief Constructor description continued.
+     *
+     *  Detailed Constructor description starts here.
+     */
 
 public slots:
     virtual QString getUserName() = 0;
