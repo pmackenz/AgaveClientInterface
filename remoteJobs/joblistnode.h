@@ -72,6 +72,8 @@ private slots:
     void setDetails(QMap<QString, QString> inputs, QMap<QString, QString> params);
 
 private:
+    void updateStandardItemEntries();
+
     JobOperator * myOperator;
     RemoteJobData myData;
 
