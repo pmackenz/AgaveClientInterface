@@ -93,6 +93,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">AgaveHandler Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>The <a class="el" href="classAgaveHandler.html" title="The AgaveHandler is a class for communicating with an Agave server over an https connection. ">AgaveHandler</a> is a class for communicating with an Agave server over an https connection.  
+ <a href="classAgaveHandler.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-slots"></a>
 Public Slots</h2></td></tr>
@@ -166,8 +169,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setAgaveConnectionPar
 <a class="el" href="classRemoteDataReply.html">RemoteDataReply</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>runAgaveJob</b> (QJsonDocument rawJobJSON)</td></tr>
 <tr class="separator:ae8d737953722c96a1e1552f511a0fa80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_slots_classRemoteDataInterface"><td colspan="2" onclick="javascript:toggleInherit('pub_slots_classRemoteDataInterface')"><img src="closed.png" alt="-"/>&#160;Public Slots inherited from <a class="el" href="classRemoteDataInterface.html">RemoteDataInterface</a></td></tr>
-<tr class="memitem:a0d2c348dbf3b60c0b3e8734e5b2dcd24 inherit pub_slots_classRemoteDataInterface"><td class="memItemLeft" align="right" valign="top">virtual QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRemoteDataInterface.html#a0d2c348dbf3b60c0b3e8734e5b2dcd24">getUserName</a> ()=0</td></tr>
-<tr class="memdesc:a0d2c348dbf3b60c0b3e8734e5b2dcd24 inherit pub_slots_classRemoteDataInterface"><td class="mdescLeft">&#160;</td><td class="mdescRight">Brief Constructor description. Brief Constructor description continued.  <a href="#a0d2c348dbf3b60c0b3e8734e5b2dcd24">More...</a><br /></td></tr>
+<tr class="memitem:a0d2c348dbf3b60c0b3e8734e5b2dcd24 inherit pub_slots_classRemoteDataInterface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0d2c348dbf3b60c0b3e8734e5b2dcd24"></a>
+virtual QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRemoteDataInterface.html#a0d2c348dbf3b60c0b3e8734e5b2dcd24">getUserName</a> ()=0</td></tr>
+<tr class="memdesc:a0d2c348dbf3b60c0b3e8734e5b2dcd24 inherit pub_slots_classRemoteDataInterface"><td class="mdescLeft">&#160;</td><td class="mdescRight">After login, getUserName will return the name of the user logged in. <br /></td></tr>
 <tr class="separator:a0d2c348dbf3b60c0b3e8734e5b2dcd24 inherit pub_slots_classRemoteDataInterface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0bf6fcac07b299bd91f9031dd159e44f inherit pub_slots_classRemoteDataInterface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0bf6fcac07b299bd91f9031dd159e44f"></a>
 virtual <a class="el" href="classRemoteDataReply.html">RemoteDataReply</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>closeAllConnections</b> ()=0</td></tr>
@@ -236,8 +240,8 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><b>AgaveHandler</b> (QNetworkAccessManager *netAccessManager, QObject *parent=nullptr)</td></tr>
 <tr class="separator:ac1ff5f54f9d0212b9f850c825473b9dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classRemoteDataInterface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classRemoteDataInterface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classRemoteDataInterface.html">RemoteDataInterface</a></td></tr>
-<tr class="memitem:a55062db895a74286f5c0d57ec3f024a8 inherit pub_methods_classRemoteDataInterface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a55062db895a74286f5c0d57ec3f024a8"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>RemoteDataInterface</b> (QObject *parent=nullptr)</td></tr>
+<tr class="memitem:a55062db895a74286f5c0d57ec3f024a8 inherit pub_methods_classRemoteDataInterface"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRemoteDataInterface.html#a55062db895a74286f5c0d57ec3f024a8">RemoteDataInterface</a> (QObject *parent=nullptr)</td></tr>
+<tr class="memdesc:a55062db895a74286f5c0d57ec3f024a8 inherit pub_methods_classRemoteDataInterface"><td class="mdescLeft">&#160;</td><td class="mdescRight">Brief Constructor description. Brief Constructor description continued.  <a href="#a55062db895a74286f5c0d57ec3f024a8">More...</a><br /></td></tr>
 <tr class="separator:a55062db895a74286f5c0d57ec3f024a8 inherit pub_methods_classRemoteDataInterface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
@@ -262,7 +266,11 @@ Additional Inherited Members</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>connectionStateChanged</b> (RemoteDataInterfaceState newState)</td></tr>
 <tr class="separator:a5018979a6d9693e529996d1fd9bc501a inherit signals_classRemoteDataInterface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-</div><!-- contents -->
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>The <a class="el" href="classAgaveHandler.html" title="The AgaveHandler is a class for communicating with an Agave server over an https connection. ">AgaveHandler</a> is a class for communicating with an Agave server over an https connection. </p>
+<p>Each <a class="el" href="classAgaveHandler.html" title="The AgaveHandler is a class for communicating with an Agave server over an https connection. ">AgaveHandler</a> is one use, from initialization, to login, through multiple remote requests, to logout. If an application wishes to re-login, a new <a class="el" href="classAgaveHandler.html" title="The AgaveHandler is a class for communicating with an Agave server over an https connection. ">AgaveHandler</a> object should be created.</p>
+<p>First, the setAgaveConnectionParams meshod should be invoked, to define some basic Agave parameters, such as the remote tenant name. Then, the performAuth method should be invoked until a successful reply is given. After that, the various remote tasks can be performed. When finished, the closeAllConnections method will logout of the remote Agave server. </p>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

@@ -93,13 +93,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Brief class description. Brief class description continued.  
+<p>The <a class="el" href="classRemoteDataInterface.html" title="The RemoteDataInterface is an abstract class for communicating with a remote file and job server over...">RemoteDataInterface</a> is an abstract class for communicating with a remote file and job server over an https connection.  
  <a href="classRemoteDataInterface.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-slots"></a>
 Public Slots</h2></td></tr>
-<tr class="memitem:a0d2c348dbf3b60c0b3e8734e5b2dcd24"><td class="memItemLeft" align="right" valign="top">virtual QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRemoteDataInterface.html#a0d2c348dbf3b60c0b3e8734e5b2dcd24">getUserName</a> ()=0</td></tr>
-<tr class="memdesc:a0d2c348dbf3b60c0b3e8734e5b2dcd24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Brief Constructor description. Brief Constructor description continued.  <a href="#a0d2c348dbf3b60c0b3e8734e5b2dcd24">More...</a><br /></td></tr>
+<tr class="memitem:a0d2c348dbf3b60c0b3e8734e5b2dcd24"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0d2c348dbf3b60c0b3e8734e5b2dcd24"></a>
+virtual QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRemoteDataInterface.html#a0d2c348dbf3b60c0b3e8734e5b2dcd24">getUserName</a> ()=0</td></tr>
+<tr class="memdesc:a0d2c348dbf3b60c0b3e8734e5b2dcd24"><td class="mdescLeft">&#160;</td><td class="mdescRight">After login, getUserName will return the name of the user logged in. <br /></td></tr>
 <tr class="separator:a0d2c348dbf3b60c0b3e8734e5b2dcd24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0bf6fcac07b299bd91f9031dd159e44f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0bf6fcac07b299bd91f9031dd159e44f"></a>
 virtual <a class="el" href="classRemoteDataReply.html">RemoteDataReply</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>closeAllConnections</b> ()=0</td></tr>
@@ -170,33 +171,30 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>connectionStateChange
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a55062db895a74286f5c0d57ec3f024a8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a55062db895a74286f5c0d57ec3f024a8"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>RemoteDataInterface</b> (QObject *parent=nullptr)</td></tr>
+<tr class="memitem:a55062db895a74286f5c0d57ec3f024a8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRemoteDataInterface.html#a55062db895a74286f5c0d57ec3f024a8">RemoteDataInterface</a> (QObject *parent=nullptr)</td></tr>
+<tr class="memdesc:a55062db895a74286f5c0d57ec3f024a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Brief Constructor description. Brief Constructor description continued.  <a href="#a55062db895a74286f5c0d57ec3f024a8">More...</a><br /></td></tr>
 <tr class="separator:a55062db895a74286f5c0d57ec3f024a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Detailed class description starts here. </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a0d2c348dbf3b60c0b3e8734e5b2dcd24"></a>
+<div class="textblock"><p>The <a class="el" href="classRemoteDataInterface.html" title="The RemoteDataInterface is an abstract class for communicating with a remote file and job server over...">RemoteDataInterface</a> is an abstract class for communicating with a remote file and job server over an https connection. </p>
+<p>This class is intended to be subclassed for actual use. At present, the <a class="el" href="classAgaveHandler.html" title="The AgaveHandler is a class for communicating with an Agave server over an https connection. ">AgaveHandler</a> class is the only subclass available. If the SimCenter project is required to used a different file or computing backend, a new subclass will have to be written.</p>
+<p>The performAuth method should be invoked before any of the methods requiring remote access. The closeAllConnections will disconnect from the remote server. <a class="el" href="classRemoteDataInterface.html" title="The RemoteDataInterface is an abstract class for communicating with a remote file and job server over...">RemoteDataInterface</a> objects are designed to be one use. To re-login, destroy the old object and create a new one. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a55062db895a74286f5c0d57ec3f024a8"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual QString RemoteDataInterface::getUserName </td>
+          <td class="memname">RemoteDataInterface::RemoteDataInterface </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">QObject *&#160;</td>
+          <td class="paramname"><em>parent</em> = <code>nullptr</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span><span class="mlabel">slot</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
+
+<p>Brief Constructor description. Brief Constructor description continued. </p>
 <p>Detailed Constructor description starts here. </p>
 
 </div>
