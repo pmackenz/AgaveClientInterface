@@ -96,11 +96,7 @@ void JobListNode::setData(RemoteJobData newData)
         }
     }
 
-    for (QPersistentModelIndex anIndex : myModelRow)
-    {
-        JobStandardItem * theModelEntry = dynamic_cast<JobStandardItem *>(myOperator->getItemModel()->itemFromIndex(anIndex));
-        if (theModelEntry != nullptr) theModelEntry->updateText(myData);
-    }
+    updateStandardItemEntries();
 
     if (signalChange)
     {
@@ -142,7 +138,10 @@ void JobListNode::setDetailTask(RemoteDataReply * newTask)
 
 void JobListNode::setJobState(QString newState)
 {
+    if (myData.getState() == newState) return;
     myData.setState(newState);
+    updateStandardItemEntries();
+    myOperator->underlyingJobChanged();
 }
 
 void JobListNode::deliverJobDetails(RequestState taskState, RemoteJobData fullJobData)
@@ -166,4 +165,13 @@ void JobListNode::deliverJobDetails(RequestState taskState, RemoteJobData fullJo
     }
 
     setDetails(fullJobData.getInputs(), fullJobData.getParams());
+}
+
+void JobListNode::updateStandardItemEntries()
+{
+    for (QPersistentModelIndex anIndex : myModelRow)
+    {
+        JobStandardItem * theModelEntry = dynamic_cast<JobStandardItem *>(myOperator->getItemModel()->itemFromIndex(anIndex));
+        if (theModelEntry != nullptr) theModelEntry->updateText(myData);
+    }
 }
